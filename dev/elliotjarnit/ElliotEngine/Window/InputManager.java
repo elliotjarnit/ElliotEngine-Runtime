@@ -23,17 +23,19 @@ public class InputManager {
         CONTROL, ALT, WINDOWS, MENU;
     }
 
+    private final Map<Key, Boolean> keyDown = new HashMap<>();
+
     public void setup() {
-        dispatcher = new KeyboardDispatcher();
-        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(dispatcher);
+        for (Key key : Key.values()) {
+            keyDown.put(key, false);
+        }
     }
 
-    @SuppressWarnings("unused")
-    public void keyPressed(Key key) {}
-    @SuppressWarnings("unused")
-    public void keyReleased(Key key) {}
-    @SuppressWarnings("unused")
-    public void keyTyped(Key key) {}
+    public boolean isKeyDown(Key key) {
+        synchronized (this) {
+            return keyDown.get(key);
+        }
+    }
 
     private class KeyboardDispatcher implements KeyEventDispatcher {
         @Override
@@ -41,11 +43,9 @@ public class InputManager {
             Key key = keyMap.get(e.getKeyCode());
             if (key != null) {
                 if (e.getID() == KeyEvent.KEY_PRESSED) {
-                    keyPressed(key);
+                    keyDown.put(key, true);
                 } else if (e.getID() == KeyEvent.KEY_RELEASED) {
-                    keyReleased(key);
-                } else if (e.getID() == KeyEvent.KEY_TYPED) {
-                    keyTyped(key);
+                    keyDown.put(key, false);
                 }
                 return true;
             }
@@ -53,7 +53,7 @@ public class InputManager {
         }
     }
 
-    Map<Integer, Key> keyMap = new HashMap<Integer, Key>() {{
+    private final Map<Integer, Key> keyMap = new HashMap<Integer, Key>() {{
         put(KeyEvent.VK_A, Key.A);
         put(KeyEvent.VK_B, Key.B);
         put(KeyEvent.VK_C, Key.C);
