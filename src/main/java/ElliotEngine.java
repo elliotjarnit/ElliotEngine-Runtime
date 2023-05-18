@@ -9,7 +9,7 @@ public abstract class ElliotEngine {
     private boolean isSetup = false;
     private boolean running = false;
     private EScene currentScene;
-    private WindowManager windowManager;
+    public WindowManager windowManager;
     public InputManager inputManager;
     public RenderingEngine renderer;
 
@@ -18,6 +18,10 @@ public abstract class ElliotEngine {
 
     private void update() {
         if (currentScene != null) {
+            for (int i = 0; i < currentScene.getObjects().size(); i++) {
+                currentScene.getObjects().get(i).update();
+            }
+
             renderer.renderScene(currentScene);
         }
     }
@@ -27,9 +31,9 @@ public abstract class ElliotEngine {
             // Setup engine
             setup();
             // Setup renderer
-            renderer = new RenderingEngine();
+            renderer = new RenderingEngine(this);
             // Setup window
-            windowManager = new WindowManager(renderer);
+            windowManager = new WindowManager(this);
             windowManager.setup();
             // Setup input
             inputManager = new InputManager();
