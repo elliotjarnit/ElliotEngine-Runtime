@@ -12,13 +12,11 @@ public abstract class EObject {
 
 
     public EObject() {
-        this.position = new Vector3(0, 0, 0);
+        this.position = new Vector3(0.0, 0.0, 0.0);
     }
-
-    public EObject(int x, int y, int z) {
+    public EObject(double x, double y, double z) {
         this.position = new Vector3(x, y, z);
     }
-
     public EObject(Vector3 position) {
         this.position = new Vector3(position);
     }

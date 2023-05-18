@@ -2,11 +2,11 @@ package src.main.java.Utils;
 
 public class MathUtils {
     public static class Vector3 {
-        public float x;
-        public float y;
-        public float z;
+        public double x;
+        public double y;
+        public double z;
 
-        public Vector3(float x, float y, float z) {
+        public Vector3(double x, double y, double z) {
             this.x = x;
             this.y = y;
             this.z = z;
@@ -42,10 +42,10 @@ public class MathUtils {
     }
 
     public static class Vector2 {
-        public float x;
-        public float y;
+        public double x;
+        public double y;
 
-        public Vector2(float x, float y) {
+        public Vector2(double x, double y) {
             this.x = x;
             this.y = y;
         }
