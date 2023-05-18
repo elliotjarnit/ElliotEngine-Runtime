@@ -1,6 +1,6 @@
-package dev.elliotjarnit.ElliotEngine.Window;
+package src.main.java.Window;
 
-import dev.elliotjarnit.ElliotEngine.Graphics.RenderingEngine;
+import src.main.java.Graphics.RenderingEngine;
 
 import javax.swing.*;
 

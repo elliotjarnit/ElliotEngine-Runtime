@@ -1,7 +1,6 @@
-package dev.elliotjarnit.ElliotEngine.Window;
+package src.main.java.Window;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Map;
 

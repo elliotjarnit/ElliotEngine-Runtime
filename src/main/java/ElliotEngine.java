@@ -1,9 +1,9 @@
-package dev.elliotjarnit.ElliotEngine;
+package src.main.java;
 
-import dev.elliotjarnit.ElliotEngine.Game.EScene;
-import dev.elliotjarnit.ElliotEngine.Graphics.RenderingEngine;
-import dev.elliotjarnit.ElliotEngine.Window.InputManager;
-import dev.elliotjarnit.ElliotEngine.Window.WindowManager;
+import src.main.java.Game.EScene;
+import src.main.java.Graphics.RenderingEngine;
+import src.main.java.Window.InputManager;
+import src.main.java.Window.WindowManager;
 
 public abstract class ElliotEngine {
     private boolean isSetup = false;
@@ -13,11 +13,13 @@ public abstract class ElliotEngine {
     public InputManager inputManager;
     public RenderingEngine renderer;
 
-    abstract void setup();
-    abstract void loop();
+    public abstract void setup();
+    public abstract void loop();
 
     private void update() {
-        renderer.renderScene(currentScene);
+        if (currentScene != null) {
+            renderer.renderScene(currentScene);
+        }
     }
 
     public void run() {

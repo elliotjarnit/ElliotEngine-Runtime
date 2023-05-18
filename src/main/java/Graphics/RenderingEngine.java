@@ -1,5 +1,6 @@
-package dev.elliotjarnit.ElliotEngine.Graphics;
-import dev.elliotjarnit.ElliotEngine.Game.EScene;
+package src.main.java.Graphics;
+import src.main.java.Game.EObject;
+import src.main.java.Game.EScene;
 
 import javax.swing.JPanel;
 import java.awt.Graphics;
@@ -26,7 +27,7 @@ public class RenderingEngine extends JPanel {
 
     public void renderScene(EScene scene) {
         // This is the main object loop. Render everything in here.
-        for (Object object : scene.getObjects()) {
+        for (EObject object : scene.getObjects()) {
 
         }
     }
