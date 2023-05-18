@@ -57,7 +57,7 @@ public class ETetrahedron extends EObject {
 
 
     private void calculateFaces() {
-        // Origin is exact center of the tetrahedron
+        // Origin is the middle of the bottom face
         // Width is the length of the lines of the bottom face
         // Height is the height of the tetrahedron from the middle of the bottom face to the top point
 
@@ -66,12 +66,13 @@ public class ETetrahedron extends EObject {
         double halfWidth = this.width / 2.0;
         double halfHeight = this.height / 2.0;
 
-        Vector3 top = new Vector3(origin.x, origin.y + height, origin.z);
-        Vector3 bottomLeft = new Vector3(origin.x - halfWidth, origin.y, origin.z - halfHeight);
-        Vector3 bottomRight = new Vector3(origin.x + halfWidth, origin.y, origin.z - halfHeight);
-        Vector3 back = new Vector3(origin.x, origin.y, origin.z + halfHeight);
+        Vector3 top = new Vector3(this.origin.x, this.origin.y - halfHeight, this.origin.z);
+        Vector3 bottomLeft = new Vector3(this.origin.x - halfWidth, this.origin.y + halfHeight, this.origin.z);
+        Vector3 bottomRight = new Vector3(this.origin.x + halfWidth, this.origin.y + halfHeight, this.origin.z);
+        Vector3 back = new Vector3(this.origin.x, this.origin.y + halfHeight, this.origin.z + halfHeight);
 
-        // Back Face
+
+        // Bottom face
         faces[0] = new EFace(bottomLeft, bottomRight, back);
         // Front
         faces[1] = new EFace(bottomRight, top, bottomLeft);

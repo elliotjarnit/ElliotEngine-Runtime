@@ -16,7 +16,7 @@ public class Engine extends ElliotEngine {
     @Override
     public void setup() {
         EScene mainScene = new EScene();
-        SpinningPyramid myObject = new SpinningPyramid(new MathUtils.Vector3(0, 0, 0), 100, 100, Color.RED);
+        SpinningPyramid myObject = new SpinningPyramid(new MathUtils.Vector3(0, 0, 0), 200, 200, Color.RED);
         mainScene.addObject(myObject);
         this.setScene(mainScene);
     }
