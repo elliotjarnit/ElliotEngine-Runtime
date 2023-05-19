@@ -39,39 +39,39 @@ public abstract class EObject {
 
     public abstract void update();
 
-    public Vector3 getPosition() {
+    public Vector3 getOrigin() {
         return this.origin;
     }
 
-    public void setPosition(Vector3 position) {
+    public void setOrigin(Vector3 position) {
         this.origin = position;
     }
 
-    public void setPosition(int x, int y, int z) {
+    public void setOrigin(int x, int y, int z) {
         this.origin = new Vector3(x, y, z);
     }
 
-    public void setPositionX(int x) {
+    public void setOriginX(int x) {
         this.origin.x = x;
     }
 
-    public void setPositionY(int y) {
+    public void setOriginY(int y) {
         this.origin.y = y;
     }
 
-    public void setPositionZ(int z) {
+    public void setOriginZ(int z) {
         this.origin.z = z;
     }
 
-    public int getPositionX() {
+    public int getOriginX() {
         return (int) this.origin.x;
     }
 
-    public int getPositionY() {
+    public int getOriginY() {
         return (int) this.origin.y;
     }
 
-    public int getPositionZ() {
+    public int getOriginZ() {
         return (int) this.origin.z;
     }
 

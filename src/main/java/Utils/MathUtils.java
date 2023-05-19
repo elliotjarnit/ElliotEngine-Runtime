@@ -40,6 +40,18 @@ public class MathUtils {
             return new Vector3(this.x / v.x, this.y / v.y, this.z / v.z);
         }
 
+        public Vector3 cross(Vector3 v) {
+            return new Vector3(
+                this.y * v.z - this.z * v.y,
+                this.z * v.x - this.x * v.z,
+                this.x * v.y - this.y * v.x
+            );
+        }
+
+        public double dot(Vector3 v) {
+            return this.x * v.x + this.y * v.y + this.z * v.z;
+        }
+
         public String toString() {
             return "(" + this.x + ", " + this.y + ", " + this.z + ")";
         }
@@ -107,6 +119,32 @@ public class MathUtils {
                     in.x * values[0] + in.y * values[3] + in.z * values[6],
                     in.x * values[1] + in.y * values[4] + in.z * values[7],
                     in.x * values[2] + in.y * values[5] + in.z * values[8]
+            );
+        }
+    }
+
+    public static class Matrix4 {
+        double[] values;
+        public Matrix4(double[] values) {
+            this.values = values;
+        }
+        public Matrix4 multiply(Matrix4 other) {
+            double[] result = new double[16];
+            for (int row = 0; row < 4; row++) {
+                for (int col = 0; col < 4; col++) {
+                    for (int i = 0; i < 4; i++) {
+                        result[row * 4 + col] +=
+                                this.values[row * 4 + i] * other.values[i * 4 + col];
+                    }
+                }
+            }
+            return new Matrix4(result);
+        }
+        public Vector3 transform(Vector3 in) {
+            return new Vector3(
+                    in.x * values[0] + in.y * values[4] + in.z * values[8] + values[12],
+                    in.x * values[1] + in.y * values[5] + in.z * values[9] + values[13],
+                    in.x * values[2] + in.y * values[6] + in.z * values[10] + values[14]
             );
         }
     }

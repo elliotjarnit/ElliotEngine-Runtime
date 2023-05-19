@@ -8,7 +8,7 @@ import src.main.java.Utils.MathUtils.Matrix3;
 import src.main.java.Utils.MathUtils.Vector3;
 import src.main.java.Utils.MathUtils.Vector2;
 
-import javax.swing.JPanel;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.Color;
 import java.awt.geom.Path2D;
@@ -32,7 +32,15 @@ public class RenderingEngine extends JPanel {
         g2d.setColor(Color.BLACK);
         g2d.fillRect(0, 0, this.getWidth(), this.getHeight());
 
+        System.out.println(this.getWidth() + "x" + this.getHeight() + "px");
+
         if (scene == null) return;
+        if (scene.getCamera() == null) {
+            g2d.setColor(Color.WHITE);
+            drawCenteredString(g2d, "No camera in scene", new Rectangle(0, 0, this.getWidth(), this.getHeight()), new Font("Arial", Font.PLAIN, 20));
+
+            return;
+        }
 
         BufferedImage img = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
 
@@ -112,5 +120,19 @@ public class RenderingEngine extends JPanel {
         double V1V2CrossP = V1V2.x * V1P.y - V1P.x * V1V2.y;
 
         return V1V2CrossV1V3 * V1V2CrossP >= 0;
+    }
+
+    public void drawCenteredString(Graphics g, String text, Rectangle rect) {
+        drawCenteredString(g, text, rect, g.getFont());
+    }
+
+    public void drawCenteredString(Graphics g, String text, Rectangle rect, Font font ) {
+        FontMetrics metrics = g.getFontMetrics(font);
+        int x = rect.x + (rect.width - metrics.stringWidth(text)) / 2;
+        int y = rect.y + ((rect.height - metrics.getHeight()) / 2) + metrics.getAscent();
+        // Set the font
+        g.setFont(font);
+        // Draw the String
+        g.drawString(text, x, y);
     }
 }
