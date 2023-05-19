@@ -21,7 +21,7 @@ public class Engine extends ElliotEngine {
         SpinningPyramid myObject = new SpinningPyramid(new MathUtils.Vector3(0, 0, 0), 200, 200, Color.RED);
         mainScene.addObject(myObject);
         mainScene.addObject(playerCamera);
-//        mainScene.setCamera(playerCamera);
+        mainScene.setCamera(playerCamera);
         this.setScene(mainScene);
     }
 

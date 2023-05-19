@@ -4,6 +4,7 @@ import src.main.java.ElliotEngine;
 import src.main.java.Game.EFace;
 import src.main.java.Game.EObject;
 import src.main.java.Game.EScene;
+import src.main.java.Utils.MathUtils.Matrix4;
 import src.main.java.Utils.MathUtils.Matrix3;
 import src.main.java.Utils.MathUtils.Vector3;
 import src.main.java.Utils.MathUtils.Vector2;
@@ -31,8 +32,6 @@ public class RenderingEngine extends JPanel {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setColor(Color.BLACK);
         g2d.fillRect(0, 0, this.getWidth(), this.getHeight());
-
-        System.out.println(this.getWidth() + "x" + this.getHeight() + "px");
 
         if (scene == null) return;
         if (scene.getCamera() == null) {
@@ -70,12 +69,10 @@ public class RenderingEngine extends JPanel {
                 Vector3 point1 = transform.transform(face.getV1());
                 Vector3 point2 = transform.transform(face.getV2());
                 Vector3 point3 = transform.transform(face.getV3());
-                point1.x += getWidth() / 2;
-                point1.y += getHeight() / 2;
-                point2.x += getWidth() / 2;
-                point2.y += getHeight() / 2;
-                point3.x += getWidth() / 2;
-                point3.y += getHeight() / 2;
+
+                // Use world to screen function
+
+
 
                 int minX = (int) Math.max(0, Math.ceil(Math.min(point1.x, Math.min(point2.x, point3.x))));
                 int maxX = (int) Math.min(img.getWidth() - 1,
@@ -134,5 +131,22 @@ public class RenderingEngine extends JPanel {
         g.setFont(font);
         // Draw the String
         g.drawString(text, x, y);
+    }
+
+    public boolean worldToScreen(Vector3 world, Vector2 screen) {
+        Matrix4 viewMatrix = scene.getCamera().getViewMatrix();
+        Matrix4 projectionMatrix = scene.getCamera().getProjectionMatrix((double) this.getWidth() / this.getHeight());
+
+        Vector3 point = new Vector3(world.x, world.y, world.z);
+
+        point = viewMatrix.transform(point);
+        point = projectionMatrix.transform(point);
+
+        if (point.z < 0) return false;
+
+        screen.x = (point.x + 1) * this.getWidth() / 2;
+        screen.y = (point.y + 1) * this.getHeight() / 2;
+
+        return true;
     }
 }

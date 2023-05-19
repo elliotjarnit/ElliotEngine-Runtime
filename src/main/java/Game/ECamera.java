@@ -43,4 +43,19 @@ public class ECamera extends EEntity {
                 }
         );
     }
+
+    public Matrix4 getProjectionMatrix(double aspectRatio) {
+        double fovRad = 1.0 / Math.tan(Math.toRadians(this.fov / 2.0));
+        double zNear = 0.1;
+        double zFar = 1000.0;
+
+        return new Matrix4(
+                new double[] {
+                        aspectRatio * fovRad, 0, 0, 0,
+                        0, fovRad, 0, 0,
+                        0, 0, zFar / (zFar - zNear), 1,
+                        0, 0, (-zFar * zNear) / (zFar - zNear), 0
+                }
+        );
+    }
 }
