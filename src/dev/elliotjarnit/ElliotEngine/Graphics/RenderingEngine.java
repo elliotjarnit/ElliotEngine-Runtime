@@ -50,6 +50,8 @@ public class RenderingEngine extends JPanel {
         // Render all objects
         for (EObject object : scene.getObjects()) {
             for (EFace face : object.getFaces()) {
+                Vector3[] points = new Vector3[3];
+
                 // Loop over all points in face
                 for (int i = 1; i <= 3; i++) {
                     Vector3 point = face.getVertices()[i - 1];
@@ -69,10 +71,28 @@ public class RenderingEngine extends JPanel {
                         point4.x *= 0.5 * getWidth();
                         point4.y *= 0.5 * getHeight();
 
-                        // Draw the point using buffered image
-                        if (point4.x >= 0 && point4.x < getWidth() && point4.y >= 0 && point4.y < getHeight()) {
-                            System.out.println("Drawing point at " + point4.x + ", " + point4.y);
-                            img.setRGB((int) point4.x, (int) point4.y, face.getColor().toAwtColor().getRGB());
+                        points[i - 1] = new Vector3(point4.x, point4.y, point4.z);
+                    }
+                }
+
+                // Little optimization
+                int minX = (int) Math.max(0, Math.ceil(Math.min(points[0].x, Math.min(points[1].x, points[2].x))));
+                int maxX = (int) Math.min(img.getWidth() - 1,
+                        Math.floor(Math.max(points[0].x, Math.max(points[1].x, points[2].x))));
+                int minY = (int) Math.max(0, Math.ceil(Math.min(points[0].y, Math.min(points[1].y, points[2].y))));
+                int maxY = (int) Math.min(img.getHeight() - 1,
+                        Math.floor(Math.max(points[0].y, Math.max(points[1].y, points[2].y))));
+
+                // Loop over pixels to check if it should be rasterized
+                for (int y = minY; y <= maxY; y++) {
+                    for (int x = minX; x <= maxX; x++) {
+                        Vector3 p = new Vector3(x,y,0);
+                        // Judge once for each vertex
+                        boolean V1 = sameSide(points[0],points[1],points[2],p);
+                        boolean V2 = sameSide(points[1],points[2],points[0],p);
+                        boolean V3 = sameSide(points[2],points[0],points[1],p);
+                        if (V3 && V2 && V1) {
+                            img.setRGB(x, y, face.getColor().toAwtColor().getRGB());
                         }
                     }
                 }
@@ -98,5 +118,18 @@ public class RenderingEngine extends JPanel {
         g.setFont(font);
         // Draw the String
         g.drawString(text, x, y);
+    }
+
+    static boolean sameSide(Vector3 A, Vector3 B, Vector3 C, Vector3 p){
+        Vector3 V1V2 = new Vector3(B.x - A.x,B.y - A.y,B.z - A.z);
+        Vector3 V1V3 = new Vector3(C.x - A.x,C.y - A.y,C.z - A.z);
+        Vector3 V1P = new Vector3(p.x - A.x,p.y - A.y,p.z - A.z);
+
+        // If the cross product of vector V1V2 and vector V1V3 is the same as the one of vector V1V2 and vector V1p, they are on the same side.
+        // We only need to judge the direction of z
+        double V1V2CrossV1V3 = V1V2.x * V1V3.y - V1V3.x * V1V2.y;
+        double V1V2CrossP = V1V2.x * V1P.y - V1P.x * V1V2.y;
+
+        return V1V2CrossV1V3 * V1V2CrossP >= 0;
     }
 }

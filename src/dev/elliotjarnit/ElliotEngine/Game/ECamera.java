@@ -1,8 +1,10 @@
 package src.dev.elliotjarnit.ElliotEngine.Game;
 
+import src.dev.elliotjarnit.ElliotEngine.Utils.MathUtils;
 import src.dev.elliotjarnit.ElliotEngine.Utils.MathUtils.Matrix4;
 import src.dev.elliotjarnit.ElliotEngine.Utils.MathUtils.Matrix3;
 import src.dev.elliotjarnit.ElliotEngine.Utils.MathUtils.Vector3;
+import src.dev.elliotjarnit.ElliotEngine.Utils.MathUtils.Vector2;
 
 public class ECamera extends EEntity {
     private double fov;
@@ -85,12 +87,24 @@ public class ECamera extends EEntity {
     }
 
     public Matrix4 getCameraMatrix() {
-        Matrix4 cameraMatrix = new Matrix4(new double[] {
-                1, 0, 0, -this.getOriginX(),
-                0, 1, 0, -this.getOriginY(),
-                0, 0, 1, -this.getOriginZ(),
+        Vector2 rotation = this.getRotation();
+        double yaw = Math.toRadians(rotation.x);
+        double pitch = Math.toRadians(rotation.y);
+
+        double cosPitch = Math.cos(pitch);
+        double sinPitch = Math.sin(pitch);
+        double cosYaw = Math.cos(yaw);
+        double sinYaw = Math.sin(yaw);
+
+        Vector3 xaxis = new Vector3(cosYaw, 0, -sinYaw);
+        Vector3 yaxis = new Vector3(sinYaw * sinPitch, cosPitch, cosYaw * sinPitch);
+        Vector3 zaxis = new Vector3(sinYaw * cosPitch, -sinPitch, cosPitch * cosYaw);
+
+        return new Matrix4(new double[] {
+                xaxis.x, xaxis.y, xaxis.z, -this.getOriginX(),
+                yaxis.x, yaxis.y, yaxis.z, -this.getOriginY(),
+                zaxis.x, zaxis.y, zaxis.z, -this.getOriginZ(),
                 0, 0, 0, 1
         });
-        return cameraMatrix;
     }
 }

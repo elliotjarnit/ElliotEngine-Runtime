@@ -17,8 +17,8 @@ public class Engine extends ElliotEngine {
     @Override
     public void setup() {
         EScene mainScene = new EScene();
-        playerCamera = new ECamera(new MathUtils.Vector3(800, 0, 0), 90.0);
-        SpinningPyramid myObject = new SpinningPyramid(new MathUtils.Vector3(5, 0, 400), 200, 200, Color.RED);
+        playerCamera = new ECamera(new MathUtils.Vector3(0, 0, 0), 90.0);
+        SpinningPyramid myObject = new SpinningPyramid(new MathUtils.Vector3(10, 0, 200), 200, 200, Color.RED);
         mainScene.addObject(myObject);
         mainScene.addObject(playerCamera);
         mainScene.setCamera(playerCamera);
@@ -27,6 +27,6 @@ public class Engine extends ElliotEngine {
 
     @Override
     public void loop() {
-
+        playerCamera.setRotation(playerCamera.getRotation().add(new MathUtils.Vector2(0.0, 0.000003)));
     }
 }
