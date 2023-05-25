@@ -1,14 +1,14 @@
 package src.test.java.BasicCubeDraw;
 
-import src.main.java.ElliotEngine;
-import src.main.java.Game.ECamera;
-import src.main.java.Game.EScene;
-import src.main.java.Game.ETetrahedron;
-import src.main.java.Graphics.Color;
-import src.main.java.Utils.MathUtils;
-import src.main.java.Window.InputManager;
+import src.dev.elliotjarnit.ElliotEngine.ElliotEngine;
+import src.dev.elliotjarnit.ElliotEngine.Game.ECamera;
+import src.dev.elliotjarnit.ElliotEngine.Game.EScene;
+import src.dev.elliotjarnit.ElliotEngine.Graphics.Color;
+import src.dev.elliotjarnit.ElliotEngine.Utils.MathUtils;
 
 public class Engine extends ElliotEngine {
+    public ECamera playerCamera;
+
     public static void main(String[] args) {
         Engine engine = new Engine();
         engine.run();
@@ -17,8 +17,8 @@ public class Engine extends ElliotEngine {
     @Override
     public void setup() {
         EScene mainScene = new EScene();
-        ECamera playerCamera = new ECamera(new MathUtils.Vector3(0, 0, 0), 90.0);
-        SpinningPyramid myObject = new SpinningPyramid(new MathUtils.Vector3(0, 0, 0), 200, 200, Color.RED);
+        playerCamera = new ECamera(new MathUtils.Vector3(800, 0, 0), 90.0);
+        SpinningPyramid myObject = new SpinningPyramid(new MathUtils.Vector3(5, 0, 400), 200, 200, Color.RED);
         mainScene.addObject(myObject);
         mainScene.addObject(playerCamera);
         mainScene.setCamera(playerCamera);

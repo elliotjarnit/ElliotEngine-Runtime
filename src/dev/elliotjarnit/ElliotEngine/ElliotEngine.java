@@ -1,9 +1,9 @@
-package src.main.java;
+package src.dev.elliotjarnit.ElliotEngine;
 
-import src.main.java.Game.EScene;
-import src.main.java.Graphics.RenderingEngine;
-import src.main.java.Window.InputManager;
-import src.main.java.Window.WindowManager;
+import src.dev.elliotjarnit.ElliotEngine.Game.EScene;
+import src.dev.elliotjarnit.ElliotEngine.Graphics.RenderingEngine;
+import src.dev.elliotjarnit.ElliotEngine.Window.InputManager;
+import src.dev.elliotjarnit.ElliotEngine.Window.WindowManager;
 
 public abstract class ElliotEngine {
     private boolean isSetup = false;

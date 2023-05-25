@@ -1,2 +1,2 @@
-# src.src.main.java.ElliotEngine
+# src.src.dev.elliotjarnit.ElliotEngine.ElliotEngine
 A Game Engine written in Java

@@ -1,11 +1,7 @@
-package src.main.java.Game;
+package src.dev.elliotjarnit.ElliotEngine.Game;
 
-import src.main.java.Graphics.Color;
-import src.main.java.Graphics.RenderingEngine;
-import src.main.java.Utils.MathUtils.Vector3;
-import src.main.java.Utils.MathUtils.Matrix3;
-
-import java.awt.*;
+import src.dev.elliotjarnit.ElliotEngine.Graphics.Color;
+import src.dev.elliotjarnit.ElliotEngine.Utils.MathUtils.Vector3;
 
 public class ETetrahedron extends EObject {
     private final double width;
@@ -57,29 +53,18 @@ public class ETetrahedron extends EObject {
 
 
     private void calculateFaces() {
-        // Origin is the middle of the bottom face
-        // Width is the length of the lines of the bottom face
-        // Height is the height of the tetrahedron from the middle of the bottom face to the top point
-
         EFace[] faces = new EFace[4];
 
-        double halfWidth = this.width / 2.0;
-        double halfHeight = this.height / 2.0;
+        Vector3[] points = new Vector3[4];
+        points[0] = new Vector3(origin.x, origin.y, origin.z);
+        points[1] = new Vector3(origin.x + width, origin.y, origin.z);
+        points[2] = new Vector3(origin.x + width / 2, origin.y + height, origin.z);
+        points[3] = new Vector3(origin.x + width / 2, origin.y + height / 2, origin.z + width);
 
-        Vector3 top = new Vector3(this.origin.x, this.origin.y - halfHeight, this.origin.z);
-        Vector3 bottomLeft = new Vector3(this.origin.x - halfWidth, this.origin.y + halfHeight, this.origin.z);
-        Vector3 bottomRight = new Vector3(this.origin.x + halfWidth, this.origin.y + halfHeight, this.origin.z);
-        Vector3 back = new Vector3(this.origin.x, this.origin.y + halfHeight, this.origin.z + halfHeight);
-
-
-        // Bottom face
-        faces[0] = new EFace(bottomLeft, bottomRight, back);
-        // Front
-        faces[1] = new EFace(bottomRight, top, bottomLeft);
-        // Left
-        faces[2] = new EFace(bottomLeft, top, back);
-        // Right
-        faces[3] = new EFace(back, top, bottomRight);
+        faces[0] = new EFace(points[0], points[1], points[2], color);
+        faces[1] = new EFace(points[0], points[1], points[3], color);
+        faces[2] = new EFace(points[1], points[2], points[3], color);
+        faces[3] = new EFace(points[2], points[0], points[3], color);
 
         this.setFaces(faces);
     }

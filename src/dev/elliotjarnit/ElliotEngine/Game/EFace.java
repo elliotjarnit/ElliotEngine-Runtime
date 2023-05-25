@@ -1,8 +1,9 @@
-package src.main.java.Game;
+package src.dev.elliotjarnit.ElliotEngine.Game;
 
-import src.main.java.Graphics.Color;
-import src.main.java.Utils.MathUtils.Vector2;
-import src.main.java.Utils.MathUtils.Vector3;
+import src.dev.elliotjarnit.ElliotEngine.Graphics.Color;
+import src.dev.elliotjarnit.ElliotEngine.Utils.MathUtils.Matrix4;
+import src.dev.elliotjarnit.ElliotEngine.Utils.MathUtils.Vector2;
+import src.dev.elliotjarnit.ElliotEngine.Utils.MathUtils.Vector3;
 
 public class EFace {
     private Vector3 v1;
@@ -71,6 +72,10 @@ public class EFace {
         return this.v3;
     }
 
+    public Vector3[] getVertices() {
+        return new Vector3[] {this.v1, this.v2, this.v3};
+    }
+
     public Vector3 getCenter() {
         return new Vector3((this.v1.x + this.v2.x + this.v3.x) / 3, (this.v1.y + this.v2.y + this.v3.y) / 3, (this.v1.z + this.v2.z + this.v3.z) / 3);
     }
@@ -105,6 +110,15 @@ public class EFace {
 
     public void setColor(Color color) {
         this.color = color;
+    }
+
+    public Matrix4 getMatrix() {
+        return new Matrix4(new double[] {
+            this.v1.x, this.v2.x, this.v3.x, 0,
+            this.v1.y, this.v2.y, this.v3.y, 0,
+            this.v1.z, this.v2.z, this.v3.z, 0,
+            1, 1, 1, 1
+        });
     }
 
     public String toString() {

@@ -1,10 +1,8 @@
-package src.main.java.Game;
+package src.dev.elliotjarnit.ElliotEngine.Game;
 
-import src.main.java.Graphics.RenderingEngine;
-import src.main.java.Utils.MathUtils.Vector2;
-import src.main.java.Utils.MathUtils.Vector3;
+import src.dev.elliotjarnit.ElliotEngine.Utils.MathUtils.Vector2;
+import src.dev.elliotjarnit.ElliotEngine.Utils.MathUtils.Vector3;
 
-import java.awt.Graphics2D;
 import java.util.Arrays;
 import java.util.Vector;
 

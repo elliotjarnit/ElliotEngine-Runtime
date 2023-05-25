@@ -1,4 +1,4 @@
-package src.main.java.Graphics;
+package src.dev.elliotjarnit.ElliotEngine.Graphics;
 
 public class Color {
     public static final Color WHITE = new Color(255, 255, 255);
@@ -65,6 +65,22 @@ public class Color {
 
     public Color div(int i) {
         return new Color(this.r / i, this.g / i, this.b / i);
+    }
+
+    public Color add(double d) {
+        return new Color((int)(this.r + d), (int)(this.g + d), (int)(this.b + d));
+    }
+
+    public Color sub(double d) {
+        return new Color((int)(this.r - d), (int)(this.g - d), (int)(this.b - d));
+    }
+
+    public Color mul(double d) {
+        return new Color((int)(this.r * d), (int)(this.g * d), (int)(this.b * d));
+    }
+
+    public Color div(double d) {
+        return new Color((int)(this.r / d), (int)(this.g / d), (int)(this.b / d));
     }
 
     public java.awt.Color toAwtColor() {

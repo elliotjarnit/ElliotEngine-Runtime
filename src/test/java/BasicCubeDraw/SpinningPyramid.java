@@ -1,9 +1,9 @@
 package src.test.java.BasicCubeDraw;
 
-import src.main.java.Game.EFace;
-import src.main.java.Game.ETetrahedron;
-import src.main.java.Graphics.Color;
-import src.main.java.Utils.MathUtils;
+import src.dev.elliotjarnit.ElliotEngine.Game.EFace;
+import src.dev.elliotjarnit.ElliotEngine.Game.ETetrahedron;
+import src.dev.elliotjarnit.ElliotEngine.Graphics.Color;
+import src.dev.elliotjarnit.ElliotEngine.Utils.MathUtils;
 
 public class SpinningPyramid extends ETetrahedron {
     public SpinningPyramid(MathUtils.Vector3 origin, double width, double height, Color color) {
@@ -22,6 +22,6 @@ public class SpinningPyramid extends ETetrahedron {
 
     @Override
     public void update() {
-        this.setRotation(this.getRotation().add(new src.main.java.Utils.MathUtils.Vector2(0.000003, 0.0)));
+        this.setRotation(this.getRotation().add(new src.dev.elliotjarnit.ElliotEngine.Utils.MathUtils.Vector2(0.000003, 0.0)));
     }
 }
