@@ -1,8 +1,8 @@
-package src.dev.elliotjarnit.ElliotEngine.Window;
+package dev.elliotjarnit.ElliotEngine.Window;
 
-import src.dev.elliotjarnit.ElliotEngine.ElliotEngine;
-import src.dev.elliotjarnit.ElliotEngine.Graphics.RenderingEngine;
-import src.dev.elliotjarnit.ElliotEngine.Utils.MathUtils.Vector2;
+import dev.elliotjarnit.ElliotEngine.ElliotEngine;
+import dev.elliotjarnit.ElliotEngine.Graphics.RenderingEngine;
+import dev.elliotjarnit.ElliotEngine.Utils.MathUtils.Vector2;
 
 import javax.swing.*;
 import java.awt.*;

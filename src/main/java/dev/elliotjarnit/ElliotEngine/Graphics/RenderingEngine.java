@@ -1,13 +1,12 @@
-package src.dev.elliotjarnit.ElliotEngine.Graphics;
+package dev.elliotjarnit.ElliotEngine.Graphics;
 
-import src.dev.elliotjarnit.ElliotEngine.ElliotEngine;
-import src.dev.elliotjarnit.ElliotEngine.Game.EFace;
-import src.dev.elliotjarnit.ElliotEngine.Game.EObject;
-import src.dev.elliotjarnit.ElliotEngine.Game.EScene;
-import src.dev.elliotjarnit.ElliotEngine.Utils.MathUtils.Matrix3;
-import src.dev.elliotjarnit.ElliotEngine.Utils.MathUtils.Matrix4;
-import src.dev.elliotjarnit.ElliotEngine.Utils.MathUtils.Vector3;
-import src.dev.elliotjarnit.ElliotEngine.Utils.MathUtils.Vector4;
+import dev.elliotjarnit.ElliotEngine.ElliotEngine;
+import dev.elliotjarnit.ElliotEngine.Objects.EFace;
+import dev.elliotjarnit.ElliotEngine.Objects.EObject;
+import dev.elliotjarnit.ElliotEngine.Objects.EScene;
+import dev.elliotjarnit.ElliotEngine.Utils.Matrix4;
+import dev.elliotjarnit.ElliotEngine.Utils.Vector3;
+import dev.elliotjarnit.ElliotEngine.Utils.Vector4;
 
 import javax.swing.*;
 import java.awt.*;
@@ -44,11 +43,14 @@ public class RenderingEngine extends JPanel {
 
         // Perspective projection matrix
         Matrix4 perspectiveProjectionMatrix = scene.getCamera().getPerspectiveProjectionMatrix((double) getHeight() / getWidth());
-        Matrix4 cameraMatrix = scene.getCamera().getCameraMatrix();
+
+        double[] zBuffer = new double[img.getWidth() * img.getHeight()];
+        Arrays.fill(zBuffer, Double.NEGATIVE_INFINITY);
 
         // This is the main object loop. Render everything in here.
         // Render all objects
         for (EObject object : scene.getObjects()) {
+            Matrix4 rotationMatrix = object.getRotationMatrix();
             for (EFace face : object.getFaces()) {
                 Vector3[] points = new Vector3[3];
 
@@ -57,9 +59,21 @@ public class RenderingEngine extends JPanel {
                     Vector3 point = face.getVertices()[i - 1];
 
                     Vector4 point4 = new Vector4(point.x, point.y, point.z, 1.0);
-                    point4 = cameraMatrix.transform(point4);
+
+                    // Invert z axis because camera is looking down -z axis
+                    // Explanation: https://www.scratchapixel.com/lessons/3d-basic-rendering/perspective-and-orthographic-projection-matrix/projection-matrices-what-you-need-to-know-first#perspective-projection-matrix
+                    Matrix4 invertZ = new Matrix4(new double[] {
+                            1, 0, 0, 0,
+                            0, 1, 0, 0,
+                            0, 0,-1,-1,
+                            0, 0, 0, 0
+                    });
+                    point4 = invertZ.transform(point4);
+
+                    // Apply perspective projection matrix
                     point4 = perspectiveProjectionMatrix.transform(point4);
 
+                    // Apply perspective divide
                     if (point4.w != 0) {
                         point4.x /= point4.w;
                         point4.y /= point4.w;
@@ -86,13 +100,25 @@ public class RenderingEngine extends JPanel {
                 // Loop over pixels to check if it should be rasterized
                 for (int y = minY; y <= maxY; y++) {
                     for (int x = minX; x <= maxX; x++) {
-                        Vector3 p = new Vector3(x,y,0);
-                        // Judge once for each vertex
-                        boolean V1 = sameSide(points[0],points[1],points[2],p);
-                        boolean V2 = sameSide(points[1],points[2],points[0],p);
-                        boolean V3 = sameSide(points[2],points[0],points[1],p);
-                        if (V3 && V2 && V1) {
-                            img.setRGB(x, y, face.getColor().toAwtColor().getRGB());
+                        Vector3 p = new Vector3(x, y, 0);
+
+                        // Check if point is inside triangle
+                        if (sameSide(points[0], points[1], points[2], p) &&
+                                sameSide(points[1], points[2], points[0], p) &&
+                                sameSide(points[2], points[0], points[1], p)) {
+
+                            // Calculate depth
+                            double depth = points[0].z + points[1].z + points[2].z;
+                            int zIndex = y * img.getWidth() + x;
+
+                            // Check if depth is less than depth buffer
+                            if (depth > zBuffer[zIndex]) {
+                                // Set depth buffer
+                                zBuffer[zIndex] = depth;
+
+                                // Set pixel
+                                img.setRGB(x, y, face.getColor().toAwtColor().getRGB());
+                            }
                         }
                     }
                 }

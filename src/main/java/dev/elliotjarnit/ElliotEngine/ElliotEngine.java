@@ -1,9 +1,9 @@
-package src.dev.elliotjarnit.ElliotEngine;
+package dev.elliotjarnit.ElliotEngine;
 
-import src.dev.elliotjarnit.ElliotEngine.Game.EScene;
-import src.dev.elliotjarnit.ElliotEngine.Graphics.RenderingEngine;
-import src.dev.elliotjarnit.ElliotEngine.Window.InputManager;
-import src.dev.elliotjarnit.ElliotEngine.Window.WindowManager;
+import dev.elliotjarnit.ElliotEngine.Objects.EScene;
+import dev.elliotjarnit.ElliotEngine.Graphics.RenderingEngine;
+import dev.elliotjarnit.ElliotEngine.Window.InputManager;
+import dev.elliotjarnit.ElliotEngine.Window.WindowManager;
 
 public abstract class ElliotEngine {
     private boolean isSetup = false;
@@ -21,8 +21,6 @@ public abstract class ElliotEngine {
             for (int i = 0; i < currentScene.getObjects().size(); i++) {
                 currentScene.getObjects().get(i).update();
             }
-
-            renderer.renderScene(currentScene);
         }
     }
 
@@ -43,9 +41,23 @@ public abstract class ElliotEngine {
         }
         windowManager.start();
         running = true;
+
+
+        // Updates 24 times per second
+        double currentTime = System.nanoTime();
+        double nextUpdate = System.nanoTime();
+        double skipTicks = 1000000000.0 / 24.0;
+
         while (running) {
-            update();
-            loop();
+            currentTime = System.nanoTime();
+
+            while (currentTime > nextUpdate) {
+                update();
+                loop();
+                nextUpdate += skipTicks;
+            }
+
+            if (currentScene != null) renderer.renderScene(currentScene);
         }
     }
 

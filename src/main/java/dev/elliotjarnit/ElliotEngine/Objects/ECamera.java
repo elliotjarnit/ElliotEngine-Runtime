@@ -1,10 +1,7 @@
-package src.dev.elliotjarnit.ElliotEngine.Game;
+package dev.elliotjarnit.ElliotEngine.Objects;
 
-import src.dev.elliotjarnit.ElliotEngine.Utils.MathUtils;
-import src.dev.elliotjarnit.ElliotEngine.Utils.MathUtils.Matrix4;
-import src.dev.elliotjarnit.ElliotEngine.Utils.MathUtils.Matrix3;
-import src.dev.elliotjarnit.ElliotEngine.Utils.MathUtils.Vector3;
-import src.dev.elliotjarnit.ElliotEngine.Utils.MathUtils.Vector2;
+import dev.elliotjarnit.ElliotEngine.Utils.Matrix4;
+import dev.elliotjarnit.ElliotEngine.Utils.Vector3;
 
 public class ECamera extends EEntity {
     private double fov;
@@ -73,9 +70,9 @@ public class ECamera extends EEntity {
         double zFar = this.getRenderDistance();
         // Look at your Perspective Project Matrix notes for explanation
         double a = aspectRatio;
-        double f = 1.0 / (Math.tan(this.getFov() / 2));
-        double z1 = (zFar / (zFar - zNear));
-        double z2 = -((zFar / (zFar - zNear)) * zNear);
+        double f = 1 / Math.tan(Math.toRadians(this.getFov() / 2));
+        double z1 = -((zFar + zNear) / (zFar - zNear));
+        double z2 = -((2 * zFar * zNear) / (zFar - zNear));
 
         // This was very complicated. I'm dumb as shit.
         return new Matrix4(new double[] {
@@ -83,28 +80,6 @@ public class ECamera extends EEntity {
                 0, f, 0, 0,
                 0, 0, z1, z2,
                 0, 0, 1, 0
-        });
-    }
-
-    public Matrix4 getCameraMatrix() {
-        Vector2 rotation = this.getRotation();
-        double yaw = Math.toRadians(rotation.x);
-        double pitch = Math.toRadians(rotation.y);
-
-        double cosPitch = Math.cos(pitch);
-        double sinPitch = Math.sin(pitch);
-        double cosYaw = Math.cos(yaw);
-        double sinYaw = Math.sin(yaw);
-
-        Vector3 xaxis = new Vector3(cosYaw, 0, -sinYaw);
-        Vector3 yaxis = new Vector3(sinYaw * sinPitch, cosPitch, cosYaw * sinPitch);
-        Vector3 zaxis = new Vector3(sinYaw * cosPitch, -sinPitch, cosPitch * cosYaw);
-
-        return new Matrix4(new double[] {
-                xaxis.x, xaxis.y, xaxis.z, -this.getOriginX(),
-                yaxis.x, yaxis.y, yaxis.z, -this.getOriginY(),
-                zaxis.x, zaxis.y, zaxis.z, -this.getOriginZ(),
-                0, 0, 0, 1
         });
     }
 }

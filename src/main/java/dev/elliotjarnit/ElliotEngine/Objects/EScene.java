@@ -1,8 +1,8 @@
-package src.dev.elliotjarnit.ElliotEngine.Game;
+package dev.elliotjarnit.ElliotEngine.Objects;
 
 import java.util.ArrayList;
 
-import src.dev.elliotjarnit.ElliotEngine.Assets.SceneBaseplate;
+import dev.elliotjarnit.ElliotEngine.Assets.SceneBaseplate;
 
 public class EScene {
     private boolean isSetup = false;

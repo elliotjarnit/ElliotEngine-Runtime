@@ -1,9 +1,9 @@
-package src.dev.elliotjarnit.ElliotEngine.Game;
+package dev.elliotjarnit.ElliotEngine.Objects;
 
-import src.dev.elliotjarnit.ElliotEngine.Graphics.Color;
-import src.dev.elliotjarnit.ElliotEngine.Utils.MathUtils.Matrix4;
-import src.dev.elliotjarnit.ElliotEngine.Utils.MathUtils.Vector2;
-import src.dev.elliotjarnit.ElliotEngine.Utils.MathUtils.Vector3;
+import dev.elliotjarnit.ElliotEngine.Graphics.Color;
+import dev.elliotjarnit.ElliotEngine.Utils.Matrix4;
+import dev.elliotjarnit.ElliotEngine.Utils.Vector2;
+import dev.elliotjarnit.ElliotEngine.Utils.Vector3;
 
 public class EFace {
     private Vector3 v1;

@@ -1,7 +1,7 @@
-package src.dev.elliotjarnit.ElliotEngine.Game;
+package dev.elliotjarnit.ElliotEngine.Objects;
 
-import src.dev.elliotjarnit.ElliotEngine.Graphics.Color;
-import src.dev.elliotjarnit.ElliotEngine.Utils.MathUtils.Vector3;
+import dev.elliotjarnit.ElliotEngine.Graphics.Color;
+import dev.elliotjarnit.ElliotEngine.Utils.Vector3;
 
 public class ETetrahedron extends EObject {
     private final double width;

@@ -1,6 +1,6 @@
-package src.dev.elliotjarnit.ElliotEngine.Game;
+package dev.elliotjarnit.ElliotEngine.Objects;
 
-import src.dev.elliotjarnit.ElliotEngine.Utils.MathUtils.Vector3;
+import dev.elliotjarnit.ElliotEngine.Utils.Vector3;
 
 public abstract class EEntity extends EObject {
     private double speed;

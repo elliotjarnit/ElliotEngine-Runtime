@@ -1,4 +1,4 @@
-package src.dev.elliotjarnit.ElliotEngine.Graphics;
+package dev.elliotjarnit.ElliotEngine.Graphics;
 
 public class Color {
     public static final Color WHITE = new Color(255, 255, 255);

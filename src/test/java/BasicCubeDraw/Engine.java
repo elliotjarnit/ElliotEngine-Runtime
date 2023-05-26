@@ -1,10 +1,10 @@
-package src.test.java.BasicCubeDraw;
+package BasicCubeDraw;
 
-import src.dev.elliotjarnit.ElliotEngine.ElliotEngine;
-import src.dev.elliotjarnit.ElliotEngine.Game.ECamera;
-import src.dev.elliotjarnit.ElliotEngine.Game.EScene;
-import src.dev.elliotjarnit.ElliotEngine.Graphics.Color;
-import src.dev.elliotjarnit.ElliotEngine.Utils.MathUtils;
+import dev.elliotjarnit.ElliotEngine.ElliotEngine;
+import dev.elliotjarnit.ElliotEngine.Objects.ECamera;
+import dev.elliotjarnit.ElliotEngine.Objects.EScene;
+import dev.elliotjarnit.ElliotEngine.Graphics.Color;
+import dev.elliotjarnit.ElliotEngine.Utils.MathUtils;
 
 public class Engine extends ElliotEngine {
     public ECamera playerCamera;
@@ -18,7 +18,7 @@ public class Engine extends ElliotEngine {
     public void setup() {
         EScene mainScene = new EScene();
         playerCamera = new ECamera(new MathUtils.Vector3(0, 0, 0), 90.0);
-        SpinningPyramid myObject = new SpinningPyramid(new MathUtils.Vector3(10, 0, 200), 200, 200, Color.RED);
+        SpinningPyramid myObject = new SpinningPyramid(new MathUtils.Vector3(0, 0, 200), 200, 200, Color.RED);
         mainScene.addObject(myObject);
         mainScene.addObject(playerCamera);
         mainScene.setCamera(playerCamera);
@@ -27,6 +27,5 @@ public class Engine extends ElliotEngine {
 
     @Override
     public void loop() {
-        playerCamera.setRotation(playerCamera.getRotation().add(new MathUtils.Vector2(0.0, 0.000003)));
     }
 }

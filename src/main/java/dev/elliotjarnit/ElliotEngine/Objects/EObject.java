@@ -1,7 +1,8 @@
-package src.dev.elliotjarnit.ElliotEngine.Game;
+package dev.elliotjarnit.ElliotEngine.Objects;
 
-import src.dev.elliotjarnit.ElliotEngine.Utils.MathUtils.Vector2;
-import src.dev.elliotjarnit.ElliotEngine.Utils.MathUtils.Vector3;
+import dev.elliotjarnit.ElliotEngine.Utils.Vector2;
+import dev.elliotjarnit.ElliotEngine.Utils.Vector3;
+import dev.elliotjarnit.ElliotEngine.Utils.Matrix4;
 
 import java.util.Arrays;
 import java.util.Vector;
@@ -112,5 +113,21 @@ public abstract class EObject {
 
     public EFace[] getFaces() {
         return this.faces;
+    }
+
+    public Matrix4 getRotationMatrix() {
+        Matrix4 xRotation = new Matrix4(new double[] {
+                1.0, 0.0, 0.0, 0.0,
+                0.0, Math.cos(this.getRotation().x), -Math.sin(this.getRotation().x), 0.0,
+                0.0, Math.sin(this.getRotation().x), Math.cos(this.getRotation().x), 0.0,
+                0.0, 0.0, 0.0, 1.0
+        });
+        Matrix4 yRotation = new Matrix4(new double[] {
+                Math.cos(this.getRotation().y), 0.0, Math.sin(this.getRotation().y), 0.0,
+                0.0, 1.0, 0.0, 0.0,
+                -Math.sin(this.getRotation().y), 0.0, Math.cos(this.getRotation().y), 0.0,
+                0.0, 0.0, 0.0, 1.0
+        });
+        return xRotation.mul(yRotation);
     }
 }

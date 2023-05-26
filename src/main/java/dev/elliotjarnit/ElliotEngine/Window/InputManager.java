@@ -1,4 +1,4 @@
-package src.dev.elliotjarnit.ElliotEngine.Window;
+package dev.elliotjarnit.ElliotEngine.Window;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.HashMap;
