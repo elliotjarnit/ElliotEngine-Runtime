@@ -2,7 +2,7 @@ package dev.elliotjarnit.ElliotEngine.Window;
 
 import dev.elliotjarnit.ElliotEngine.ElliotEngine;
 import dev.elliotjarnit.ElliotEngine.Graphics.RenderingEngine;
-import dev.elliotjarnit.ElliotEngine.Utils.MathUtils.Vector2;
+import dev.elliotjarnit.ElliotEngine.Utils.Vector2;
 
 import javax.swing.*;
 import java.awt.*;

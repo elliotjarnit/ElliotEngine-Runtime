@@ -3,10 +3,11 @@ package BasicCubeDraw;
 import dev.elliotjarnit.ElliotEngine.Objects.EFace;
 import dev.elliotjarnit.ElliotEngine.Objects.ETetrahedron;
 import dev.elliotjarnit.ElliotEngine.Graphics.Color;
-import dev.elliotjarnit.ElliotEngine.Utils.MathUtils;
+import dev.elliotjarnit.ElliotEngine.Utils.Vector2;
+import dev.elliotjarnit.ElliotEngine.Utils.Vector3;
 
 public class SpinningPyramid extends ETetrahedron {
-    public SpinningPyramid(MathUtils.Vector3 origin, double width, double height, Color color) {
+    public SpinningPyramid(Vector3 origin, double width, double height, Color color) {
         super(origin, width, height, color);
         Color[] colors = {
                 Color.RED,
@@ -22,6 +23,6 @@ public class SpinningPyramid extends ETetrahedron {
 
     @Override
     public void update() {
-        this.setRotation(this.getRotation().add(new MathUtils.Vector2(1, 0.0)));
+        this.setRotation(this.getRotation().add(new Vector2(1, 0.0)));
     }
 }

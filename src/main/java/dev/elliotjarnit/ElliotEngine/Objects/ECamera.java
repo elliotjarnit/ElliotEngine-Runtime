@@ -1,7 +1,9 @@
 package dev.elliotjarnit.ElliotEngine.Objects;
 
+import dev.elliotjarnit.ElliotEngine.Utils.Matrix3;
 import dev.elliotjarnit.ElliotEngine.Utils.Matrix4;
 import dev.elliotjarnit.ElliotEngine.Utils.Vector3;
+import dev.elliotjarnit.ElliotEngine.Utils.Vector2;
 
 public class ECamera extends EEntity {
     private double fov;
@@ -64,22 +66,47 @@ public class ECamera extends EEntity {
         this.nearDistance = nearDistance;
     }
 
-    // Aspect ratio is height / width
     public Matrix4 getPerspectiveProjectionMatrix(double aspectRatio) {
-        double zNear = this.getNearDistance();
-        double zFar = this.getRenderDistance();
-        // Look at your Perspective Project Matrix notes for explanation
-        double a = aspectRatio;
-        double f = 1 / Math.tan(Math.toRadians(this.getFov() / 2));
-        double z1 = -((zFar + zNear) / (zFar - zNear));
-        double z2 = -((2 * zFar * zNear) / (zFar - zNear));
+        double far = this.getRenderDistance();
+        double near = this.getNearDistance();
 
-        // This was very complicated. I'm dumb as shit.
+        double t = Math.tan(this.fov * 0.5 * Math.PI / 180) * near;
+        double r = aspectRatio * t;
+        double l = -r;
+        double b = -t;
+
         return new Matrix4(new double[] {
-                f * a, 0, 0, 0,
-                0, f, 0, 0,
-                0, 0, z1, z2,
-                0, 0, 1, 0
+                2 * near / (r - l), 0, 0,  0,
+                0, 2 * near / (t - b), 0,  0,
+                (r + l) / (r - l), (t + b) / (t - b), -(far + near) / (far / near), -1,
+                0, 0, -2 * far * near / (far - near), 0
         });
+    }
+
+    public Matrix3 getViewMatrix() {
+        double heading = Math.toRadians(this.getRotation().x);
+        double pitch = Math.toRadians(this.getRotation().y);
+
+        Matrix3 headingTransform = new Matrix3(new double[] {
+                Math.cos(heading), 0, -Math.sin(heading),
+                0, 1, 0,
+                Math.sin(heading), 0, Math.cos(heading)
+        });
+
+        Matrix3 pitchTransform = new Matrix3(new double[] {
+                1, 0, 0,
+                0, Math.cos(pitch), Math.sin(pitch),
+                0, -Math.sin(pitch), Math.cos(pitch)
+        });
+
+        Vector3 negativeCameraPosition = new Vector3(-this.getOrigin().x, -this.getOrigin().y, -this.getOrigin().z);
+
+        Matrix3 cameraTranslation = new Matrix3(new double[] {
+                1, 0, negativeCameraPosition.x,
+                0, 1, negativeCameraPosition.y,
+                0, 0, negativeCameraPosition.z
+        });
+
+        return headingTransform.mul(pitchTransform).mul(cameraTranslation);
     }
 }
