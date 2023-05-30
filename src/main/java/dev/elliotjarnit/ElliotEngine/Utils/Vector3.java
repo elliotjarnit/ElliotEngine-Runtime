@@ -43,6 +43,14 @@ public class Vector3 {
         return new Vector3(this.x / d, this.y / d, this.z / d);
     }
 
+    public Vector3 cross(Vector3 v) {
+        return new Vector3(
+                this.y * v.z - this.z * v.y,
+                this.z * v.x - this.x * v.z,
+                this.x * v.y - this.y * v.x
+        );
+    }
+
     public String toString() {
         return "(" + this.x + ", " + this.y + ", " + this.z + ")";
     }

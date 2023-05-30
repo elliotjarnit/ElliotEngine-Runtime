@@ -66,6 +66,10 @@ public class ECamera extends EEntity {
         this.nearDistance = nearDistance;
     }
 
+    public void move(Vector3 direction) {
+        this.setOrigin(this.getOrigin().add(direction));
+    }
+
     public Matrix4 getPerspectiveProjectionMatrix(double aspectRatio) {
         double far = this.getRenderDistance();
         double near = this.getNearDistance();
@@ -83,30 +87,23 @@ public class ECamera extends EEntity {
         });
     }
 
-    public Matrix3 getViewMatrix() {
-        double heading = Math.toRadians(this.getRotation().x);
+    public Matrix4 getCameraToWorld() {
+        Vector3 position = this.getOrigin();
+
+        double yaw = Math.toRadians(this.getRotation().x);
         double pitch = Math.toRadians(this.getRotation().y);
 
-        Matrix3 headingTransform = new Matrix3(new double[] {
-                Math.cos(heading), 0, -Math.sin(heading),
-                0, 1, 0,
-                Math.sin(heading), 0, Math.cos(heading)
+        double cosYaw = Math.cos(yaw);
+        double sinYaw = Math.sin(yaw);
+        double cosPitch = Math.cos(pitch);
+        double sinPitch = Math.sin(pitch);
+
+        // Row major
+        return new Matrix4(new double[] {
+            cosYaw, 0, -sinYaw, 0,
+            sinYaw * sinPitch, cosPitch, cosYaw * sinPitch, 0,
+            sinYaw * cosPitch, -sinPitch, cosYaw * cosPitch, 0,
+            position.x, position.y, position.z, 1
         });
-
-        Matrix3 pitchTransform = new Matrix3(new double[] {
-                1, 0, 0,
-                0, Math.cos(pitch), Math.sin(pitch),
-                0, -Math.sin(pitch), Math.cos(pitch)
-        });
-
-        Vector3 negativeCameraPosition = new Vector3(-this.getOrigin().x, -this.getOrigin().y, -this.getOrigin().z);
-
-        Matrix3 cameraTranslation = new Matrix3(new double[] {
-                1, 0, negativeCameraPosition.x,
-                0, 1, negativeCameraPosition.y,
-                0, 0, negativeCameraPosition.z
-        });
-
-        return headingTransform.mul(pitchTransform).mul(cameraTranslation);
     }
 }

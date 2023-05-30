@@ -55,16 +55,17 @@ public class ETetrahedron extends EObject {
     private void calculateFaces() {
         EFace[] faces = new EFace[4];
 
-        Vector3[] points = new Vector3[4];
-        points[0] = new Vector3(origin.x, origin.y, origin.z);
-        points[1] = new Vector3(origin.x + width, origin.y, origin.z);
-        points[2] = new Vector3(origin.x + width / 2, origin.y + height, origin.z);
-        points[3] = new Vector3(origin.x + width / 2, origin.y + height / 2, origin.z + width);
+        // Origin is center of bottom face
 
-        faces[0] = new EFace(points[0], points[1], points[2], color);
-        faces[1] = new EFace(points[0], points[1], points[3], color);
-        faces[2] = new EFace(points[1], points[2], points[3], color);
-        faces[3] = new EFace(points[2], points[0], points[3], color);
+        Vector3 top = new Vector3(origin.x, origin.y + height, origin.z);
+        Vector3 frontLeft = new Vector3(origin.x - width / 2, origin.y, origin.z + width / 2);
+        Vector3 frontRight = new Vector3(origin.x + width / 2, origin.y, origin.z + width / 2);
+        Vector3 backLeft = new Vector3(origin.x - width / 2, origin.y, origin.z - width / 2);
+
+        faces[0] = new EFace(frontLeft, frontRight, top, color);
+        faces[1] = new EFace(frontRight, backLeft, top, color);
+        faces[2] = new EFace(backLeft, frontLeft, top, color);
+        faces[3] = new EFace(frontLeft, frontRight, backLeft, color);
 
         this.setFaces(faces);
     }

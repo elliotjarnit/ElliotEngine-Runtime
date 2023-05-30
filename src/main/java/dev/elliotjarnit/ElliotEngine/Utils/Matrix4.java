@@ -43,6 +43,66 @@ public class Matrix4 {
         );
     }
 
+    public Matrix4 inverse() {
+        double[] augmented = new double[32];
+
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (j < 4) {
+                    augmented[i * 8 + j] = values[i * 4 + j];
+                } else {
+                    augmented[i * 8 + j] = (i == (j - 4)) ? 1.0f : 0.0f;
+                }
+            }
+        }
+
+        for (int pivot = 0; pivot < 4; pivot++) {
+            // Find the pivot row
+            int maxRow = pivot;
+            for (int i = pivot + 1; i < 4; i++) {
+                if (Math.abs(augmented[i * 8 + pivot]) > Math.abs(augmented[maxRow * 8 +pivot])) {
+                    maxRow = i;
+                }
+            }
+
+            // Swap the pivot row with the maxRow
+            double[] temp = new double[8];
+
+            System.arraycopy(augmented, pivot * 8, temp, 0, 8);
+
+            for (int i = 0; i < 8; i++) {
+                augmented[pivot * 8 + i] = augmented[maxRow * 8 + i];
+            }
+
+            System.arraycopy(temp, 0, augmented, maxRow * 8, 8);
+
+            // Scale the pivot row
+            double pivotValue = augmented[pivot * 8 + pivot];
+            for (int j = 0; j < 8; j++) {
+                augmented[pivot * 8 + j] /= pivotValue;
+            }
+
+            // Eliminate other rows
+            for (int i = 0; i < 4; i++) {
+                if (i != pivot) {
+                    double factor = augmented[i * 8 + pivot];
+                    for (int j = 0; j < 8; j++) {
+                        augmented[i * 8 + j] -= factor * augmented[pivot * 8 + j];
+                    }
+                }
+            }
+        }
+
+        double[] invertedMatrix = new double[16];
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                invertedMatrix[i * 4 + j] = augmented[i * 8 + (j + 4)];
+            }
+        }
+
+        return new Matrix4(invertedMatrix);
+    }
+
     public String toString() {
         return "[" + values[0] + ", " + values[1] + ", " + values[2] + ", " + values[3] + "]\n" +
                 "[" + values[4] + ", " + values[5] + ", " + values[6] + ", " + values[7] + "]\n" +

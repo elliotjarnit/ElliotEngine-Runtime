@@ -28,6 +28,8 @@ public class InputManager {
         for (Key key : Key.values()) {
             keyDown.put(key, false);
         }
+        dispatcher = new KeyboardDispatcher();
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(dispatcher);
     }
 
     public boolean isKeyDown(Key key) {
