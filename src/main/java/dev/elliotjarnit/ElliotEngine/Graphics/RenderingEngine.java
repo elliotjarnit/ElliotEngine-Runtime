@@ -9,13 +9,13 @@ import dev.elliotjarnit.ElliotEngine.Utils.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 
 public class RenderingEngine extends JPanel {
     private EScene scene;
     private final ElliotEngine engine;
+    private final boolean meshMap = true;
 
     public RenderingEngine(ElliotEngine engine) {
         super();
@@ -27,12 +27,12 @@ public class RenderingEngine extends JPanel {
     @Override
     public void paintComponent(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
-        g2d.setColor(Color.BLACK);
+        g2d.setColor(Color.BLACK.toAwtColor());
         g2d.fillRect(0, 0, this.getWidth(), this.getHeight());
 
         if (scene == null) return;
         if (scene.getCamera() == null) {
-            g2d.setColor(Color.WHITE);
+            g2d.setColor(Color.WHITE.toAwtColor());
             drawCenteredString(g2d, "No camera in scene", new Rectangle(0, 0, this.getWidth(), this.getHeight()));
 
             return;
@@ -106,33 +106,46 @@ public class RenderingEngine extends JPanel {
                     points[i - 1] = new Vector3(point4.x, point4.y, point4.z);
                 }
 
+                if (!meshMap) {
 
-                if (points[0] == null || points[1] == null || points[2] == null) {
-                    continue;
-                }
+                    if (points[0] == null || points[1] == null || points[2] == null) {
+                        continue;
+                    }
 
-                Vector2 p1 = new Vector2(points[0].x, points[0].y);
-                Vector2 p2 = new Vector2(points[1].x, points[1].y);
-                Vector2 p3 = new Vector2(points[2].x, points[2].y);
+                    Vector2 p1 = new Vector2(points[0].x, points[0].y);
+                    Vector2 p2 = new Vector2(points[1].x, points[1].y);
+                    Vector2 p3 = new Vector2(points[2].x, points[2].y);
 
-                for (int y = 0; y < this.getHeight(); ++y) {
-                    for (int x = 0; x < this.getWidth(); ++x) {
-                        Vector2 pixel = new Vector2(x + 0.5, y + 0.5);
+                    for (int y = 0; y < this.getHeight(); ++y) {
+                        for (int x = 0; x < this.getWidth(); ++x) {
+                            Vector2 pixel = new Vector2(x + 0.5, y + 0.5);
 
-                        double w1 = edgeFunction(p2, p3, pixel);
-                        double w2 = edgeFunction(p3, p1, pixel);
-                        double w3 = edgeFunction(p1, p2, pixel);
+                            double w1 = edgeFunction(p2, p3, pixel);
+                            double w2 = edgeFunction(p3, p1, pixel);
+                            double w3 = edgeFunction(p1, p2, pixel);
 
-                        if (w1 >= 0 && w2 >= 0 && w3 >= 0) {
-                            double oneOverZ = points[0].z * w1 + points[1].z * w2 + points[2].z * w3;
-                            double z = 1.0 / oneOverZ;
+                            if (w1 >= 0 && w2 >= 0 && w3 >= 0) {
+                                double oneOverZ = points[0].z * w1 + points[1].z * w2 + points[2].z * w3;
+                                double z = 1.0 / oneOverZ;
 
-                            if (z > zBuffer[y * this.getWidth() + x]) {
-                                zBuffer[y * this.getWidth() + x] = z;
+                                if (z > zBuffer[y * this.getWidth() + x]) {
+                                    zBuffer[y * this.getWidth() + x] = z;
 
-                                img.setRGB(x, y, face.getColor().toAwtColor().getRGB());
+                                    img.setRGB(x, y, face.getColor().toAwtColor().getRGB());
+                                }
                             }
                         }
+                    }
+                } else {
+                    g2d.setColor(Color.WHITE.toAwtColor());
+                    if (points[0] != null && points[1] != null) {
+                        g2d.drawLine((int) points[0].x, (int) points[0].y, (int) points[1].x, (int) points[1].y);
+                    }
+                    if (points[1] != null && points[2] != null) {
+                        g2d.drawLine((int) points[1].x, (int) points[1].y, (int) points[2].x, (int) points[2].y);
+                    }
+                    if (points[2] != null && points[0] != null) {
+                        g2d.drawLine((int) points[2].x, (int) points[2].y, (int) points[0].x, (int) points[0].y);
                     }
                 }
             }

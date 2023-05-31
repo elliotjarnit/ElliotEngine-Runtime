@@ -6,9 +6,9 @@ import dev.elliotjarnit.ElliotEngine.Objects.EObject;
 import dev.elliotjarnit.ElliotEngine.Utils.Vector3;
 
 public class ECube extends EObject {
-    private final double width;
-    private final double height;
-    private final double depth;
+    private double width;
+    private double height;
+    private double depth;
     private Color color;
 
 
@@ -113,10 +113,29 @@ public class ECube extends EObject {
     public double getWidth() {
         return this.width;
     }
+    public void setWidth(double width) {
+        this.width = width;
+        this.calculateFaces();
+    }
     public double getHeight() {
         return this.height;
     }
+    public void setHeight(double height) {
+        this.height = height;
+        this.calculateFaces();
+    }
     public double getDepth() {
         return this.depth;
+    }
+    public void setDepth(double depth) {
+        this.depth = depth;
+        this.calculateFaces();
+    }
+    public Color getColor() {
+        return this.color;
+    }
+    public void setColor(Color color) {
+        this.color = color;
+        this.calculateFaces();
     }
 }
