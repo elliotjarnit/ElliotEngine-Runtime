@@ -11,7 +11,8 @@ import dev.elliotjarnit.ElliotEngine.Utils.Vector3;
 import dev.elliotjarnit.ElliotEngine.Window.InputManager;
 
 public class Engine extends ElliotEngine {
-    public ECamera playerCamera;
+    private ECamera playerCamera;
+    private double sensitivity = 0.3;
 
     public static void main(String[] args) {
         Engine engine = new Engine();
@@ -74,6 +75,6 @@ public class Engine extends ElliotEngine {
         // Mouse movement
         Vector2 mouseDelta = this.inputManager.getMouseDelta();
 
-        playerCamera.setRotation(playerCamera.getRotation().add(new Vector2(mouseDelta.y * 0.3, mouseDelta.x * 0.3)));
+        playerCamera.setRotation(playerCamera.getRotation().add(new Vector2(mouseDelta.y * this.sensitivity, mouseDelta.x * this.sensitivity)));
     }
 }
