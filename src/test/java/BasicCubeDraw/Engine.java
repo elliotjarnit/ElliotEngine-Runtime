@@ -3,6 +3,7 @@ package BasicCubeDraw;
 import dev.elliotjarnit.ElliotEngine.ElliotEngine;
 import dev.elliotjarnit.ElliotEngine.Objects.ECamera;
 import dev.elliotjarnit.ElliotEngine.Objects.EScene;
+import dev.elliotjarnit.ElliotEngine.Objects.ECube;
 import dev.elliotjarnit.ElliotEngine.Graphics.Color;
 import dev.elliotjarnit.ElliotEngine.Utils.Matrix4;
 import dev.elliotjarnit.ElliotEngine.Utils.Vector2;
@@ -19,13 +20,15 @@ public class Engine extends ElliotEngine {
 
     @Override
     public void setup() {
+        this.inputManager.takeoverMouse();
+
         EScene mainScene = new EScene();
         playerCamera = new ECamera(new Vector3(0.1, 0.1, 0.1), 60.0);
         playerCamera.setRenderDistance(1000.0);
         SpinningPyramid myObject = new SpinningPyramid(new Vector3(0, 0, 20), 5, 5, Color.RED);
-//        SpinningPyramid myObject2 = new SpinningPyramid(new Vector3(-10, 0, 0), 5, 5, Color.RED);
+        ECube myCube = new ECube(new Vector3(20, 0, 20), 5, 5, 5, Color.CYAN);
         mainScene.addObject(myObject);
-//        mainScene.addObject(myObject2);
+        mainScene.addObject(myCube);
         mainScene.addObject(playerCamera);
         mainScene.setCamera(playerCamera);
         this.setScene(mainScene);
@@ -44,6 +47,7 @@ public class Engine extends ElliotEngine {
     @Override
     public void loop() {
         if (this.inputManager.isKeyDown(InputManager.Key.W)) {
+            System.out.println("W");
             playerCamera.move(new Vector3(0, 0, 0.5));
         }
 
@@ -58,5 +62,18 @@ public class Engine extends ElliotEngine {
         if (this.inputManager.isKeyDown(InputManager.Key.D)) {
             playerCamera.move(new Vector3(-0.5, 0, 0));
         }
+
+        if (this.inputManager.isKeyDown(InputManager.Key.SPACE)) {
+            playerCamera.move(new Vector3(0, 0.5, 0));
+        }
+
+        if (this.inputManager.isKeyDown(InputManager.Key.SHIFT)) {
+            playerCamera.move(new Vector3(0, -0.5, 0));
+        }
+
+        // Mouse movement
+        Vector2 mouseDelta = this.inputManager.getMouseDelta();
+
+        playerCamera.setRotation(playerCamera.getRotation().add(new Vector2(mouseDelta.y * 0.3, mouseDelta.x * 0.3)));
     }
 }

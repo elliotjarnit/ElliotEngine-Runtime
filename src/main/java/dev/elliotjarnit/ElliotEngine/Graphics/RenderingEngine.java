@@ -1,6 +1,7 @@
 package dev.elliotjarnit.ElliotEngine.Graphics;
 
 import dev.elliotjarnit.ElliotEngine.ElliotEngine;
+import dev.elliotjarnit.ElliotEngine.Objects.ECamera;
 import dev.elliotjarnit.ElliotEngine.Objects.EFace;
 import dev.elliotjarnit.ElliotEngine.Objects.EObject;
 import dev.elliotjarnit.ElliotEngine.Objects.EScene;
@@ -52,6 +53,10 @@ public class RenderingEngine extends JPanel {
         // Render all objects
         for (EObject object : scene.getObjects()) {
             Matrix4 rotationMatrix = object.getRotationMatrix();
+
+            if (object.getFaces() == null) continue;
+            if (object.getClass() == ECamera.class) continue;
+
             for (EFace face : object.getFaces()) {
                 Vector3[] points = new Vector3[3];
 
@@ -70,6 +75,11 @@ public class RenderingEngine extends JPanel {
                     point4.x /= point4.w;
                     point4.y /= point4.w;
                     point4.z /= point4.w;
+
+                    if (point4.z < 0.0) {
+                        // Point is behind camera
+                        continue;
+                    }
 
                     point4.w = 1.0;
 
@@ -96,40 +106,35 @@ public class RenderingEngine extends JPanel {
                     points[i - 1] = new Vector3(point4.x, point4.y, point4.z);
                 }
 
-                if (points[0] != null && points[1] != null) {
-                    g2d.setColor(Color.WHITE);
-                    g2d.drawLine((int) points[0].x, (int) points[0].y, (int) points[1].x, (int) points[1].y);
+
+                if (points[0] == null || points[1] == null || points[2] == null) {
+                    continue;
                 }
 
-                if (points[1] != null && points[2] != null) {
-                    g2d.setColor(Color.WHITE);
-                    g2d.drawLine((int) points[1].x, (int) points[1].y, (int) points[2].x, (int) points[2].y);
+                Vector2 p1 = new Vector2(points[0].x, points[0].y);
+                Vector2 p2 = new Vector2(points[1].x, points[1].y);
+                Vector2 p3 = new Vector2(points[2].x, points[2].y);
+
+                for (int y = 0; y < this.getHeight(); ++y) {
+                    for (int x = 0; x < this.getWidth(); ++x) {
+                        Vector2 pixel = new Vector2(x + 0.5, y + 0.5);
+
+                        double w1 = edgeFunction(p2, p3, pixel);
+                        double w2 = edgeFunction(p3, p1, pixel);
+                        double w3 = edgeFunction(p1, p2, pixel);
+
+                        if (w1 >= 0 && w2 >= 0 && w3 >= 0) {
+                            double oneOverZ = points[0].z * w1 + points[1].z * w2 + points[2].z * w3;
+                            double z = 1.0 / oneOverZ;
+
+                            if (z > zBuffer[y * this.getWidth() + x]) {
+                                zBuffer[y * this.getWidth() + x] = z;
+
+                                img.setRGB(x, y, face.getColor().toAwtColor().getRGB());
+                            }
+                        }
+                    }
                 }
-
-                if (points[2] != null && points[0] != null) {
-                    g2d.setColor(Color.WHITE);
-                    g2d.drawLine((int) points[2].x, (int) points[2].y, (int) points[0].x, (int) points[0].y);
-                }
-
-
-
-//                double area = edgeFunction(p1, p2, p3);
-
-//                for (int y = 0; y < this.getHeight(); ++y) {
-//                    for (int x = 0; x < this.getWidth(); ++x) {
-//                        Vector2 pixel = new Vector2(x + 0.5, y + 0.5);
-//
-//                        double w1 = edgeFunction(p2, p3, pixel);
-//                        double w2 = edgeFunction(p3, p1, pixel);
-//                        double w3 = edgeFunction(p1, p2, pixel);
-//
-//                        if (w1 >= 0 && w2 >= 0 && w3 >= 0) {
-//                            img.setRGB(x, y, face.getColor().toAwtColor().getRGB());
-//                        }
-//                    }
-//                }
-
-
             }
         }
         g2d.drawImage(img, 0, 0, null);

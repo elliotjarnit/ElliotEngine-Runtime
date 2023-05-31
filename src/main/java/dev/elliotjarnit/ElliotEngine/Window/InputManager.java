@@ -1,41 +1,62 @@
 package dev.elliotjarnit.ElliotEngine.Window;
+import dev.elliotjarnit.ElliotEngine.ElliotEngine;
+import dev.elliotjarnit.ElliotEngine.Utils.Vector2;
+import dev.elliotjarnit.ElliotEngine.Utils.Vector3;
+
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
+import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 
 public class InputManager {
-    private KeyboardDispatcher dispatcher;
-    public enum Key {
-        A, B, C, D, E, F, G, H, I, J, K, L, M,
-        N, O, P, Q, R, S, T, U, V, W, X, Y, Z,
-        NUM_0, NUM_1, NUM_2, NUM_3, NUM_4,
-        NUM_5, NUM_6, NUM_7, NUM_8, NUM_9,
-        ESCAPE, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12,
-        GRAVE, MINUS, EQUALS, BACKSPACE, TAB, OPEN_BRACKET, CLOSE_BRACKET,
-        BACKSLASH, CAPS_LOCK, SEMICOLON, QUOTE, ENTER, SHIFT, COMMA, PERIOD,
-        SLASH, SPACE, INSERT, DELETE, HOME, END, PAGE_UP, PAGE_DOWN,
-        PRINT_SCREEN, SCROLL_LOCK, PAUSE, UP, DOWN, LEFT, RIGHT,
-        NUM_LOCK, NUMPAD_0, NUMPAD_1, NUMPAD_2, NUMPAD_3, NUMPAD_4, NUMPAD_5,
-        NUMPAD_6, NUMPAD_7, NUMPAD_8, NUMPAD_9, NUMPAD_ADD, NUMPAD_SUBTRACT,
-        NUMPAD_MULTIPLY, NUMPAD_DIVIDE, NUMPAD_DECIMAL, NUMPAD_ENTER,
-        CONTROL, ALT, WINDOWS, MENU;
-    }
-
+    private ElliotEngine engine;
+    private KeyboardDispatcher keyDispatcher;
+    private MouseDispatcher mouseDispatcher;
+    private Robot robot;
     private final Map<Key, Boolean> keyDown = new HashMap<>();
+    private Vector2 mouseLast = new Vector2(0, 0);
+    private Vector2 mouse = new Vector2(0, 0);
+
+    public InputManager(ElliotEngine engine) {
+        this.engine = engine;
+    }
 
     public void setup() {
         for (Key key : Key.values()) {
             keyDown.put(key, false);
         }
-        dispatcher = new KeyboardDispatcher();
-        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(dispatcher);
+
+        try {
+            robot = new Robot();
+        } catch (AWTException e) {
+            e.printStackTrace();
+        }
+
+        keyDispatcher = new KeyboardDispatcher();
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(keyDispatcher);
+
+        mouseDispatcher = new MouseDispatcher();
+        this.engine.windowManager.getWindow().addMouseMotionListener(mouseDispatcher);
     }
 
     public boolean isKeyDown(Key key) {
         synchronized (this) {
             return keyDown.get(key);
         }
+    }
+
+    public Vector2 getMouseDelta() {
+        return mouse.sub(mouseLast);
+    }
+
+    public void takeoverMouse() {
+        this.engine.windowManager.getWindow().setCursor(this.engine.windowManager.getWindow().getToolkit().createCustomCursor(
+                new BufferedImage(3, 3, BufferedImage.TYPE_INT_ARGB), new Point(0, 0), "null"));
+
+        this.engine.windowManager.getWindow().setFocusTraversalKeysEnabled(false);
     }
 
     private class KeyboardDispatcher implements KeyEventDispatcher {
@@ -52,6 +73,36 @@ public class InputManager {
             }
             return false;
         }
+    }
+
+    private class MouseDispatcher implements MouseMotionListener {
+
+        @Override
+        public void mouseMoved(MouseEvent e) {
+            mouseLast = mouse;
+            mouse = new Vector2(e.getX(), e.getY());
+        }
+        @Override
+        public void mouseDragged(MouseEvent e) {
+        }
+
+
+    }
+
+    public enum Key {
+        A, B, C, D, E, F, G, H, I, J, K, L, M,
+        N, O, P, Q, R, S, T, U, V, W, X, Y, Z,
+        NUM_0, NUM_1, NUM_2, NUM_3, NUM_4,
+        NUM_5, NUM_6, NUM_7, NUM_8, NUM_9,
+        ESCAPE, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12,
+        GRAVE, MINUS, EQUALS, BACKSPACE, TAB, OPEN_BRACKET, CLOSE_BRACKET,
+        BACKSLASH, CAPS_LOCK, SEMICOLON, QUOTE, ENTER, SHIFT, COMMA, PERIOD,
+        SLASH, SPACE, INSERT, DELETE, HOME, END, PAGE_UP, PAGE_DOWN,
+        PRINT_SCREEN, SCROLL_LOCK, PAUSE, UP, DOWN, LEFT, RIGHT,
+        NUM_LOCK, NUMPAD_0, NUMPAD_1, NUMPAD_2, NUMPAD_3, NUMPAD_4, NUMPAD_5,
+        NUMPAD_6, NUMPAD_7, NUMPAD_8, NUMPAD_9, NUMPAD_ADD, NUMPAD_SUBTRACT,
+        NUMPAD_MULTIPLY, NUMPAD_DIVIDE, NUMPAD_DECIMAL, NUMPAD_ENTER,
+        CONTROL, ALT, WINDOWS, MENU;
     }
 
     private final Map<Integer, Key> keyMap = new HashMap<Integer, Key>() {{

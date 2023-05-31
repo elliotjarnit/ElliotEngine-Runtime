@@ -87,23 +87,35 @@ public class ECamera extends EEntity {
         });
     }
 
+    // Row major
     public Matrix4 getCameraToWorld() {
         Vector3 position = this.getOrigin();
+        Vector2 rotation = new Vector2();
+        rotation.x = Math.toRadians(this.getRotation().x);
+        rotation.y = Math.toRadians(this.getRotation().y);
 
-        double yaw = Math.toRadians(this.getRotation().x);
-        double pitch = Math.toRadians(this.getRotation().y);
-
-        double cosYaw = Math.cos(yaw);
-        double sinYaw = Math.sin(yaw);
-        double cosPitch = Math.cos(pitch);
-        double sinPitch = Math.sin(pitch);
-
-        // Row major
-        return new Matrix4(new double[] {
-            cosYaw, 0, -sinYaw, 0,
-            sinYaw * sinPitch, cosPitch, cosYaw * sinPitch, 0,
-            sinYaw * cosPitch, -sinPitch, cosYaw * cosPitch, 0,
-            position.x, position.y, position.z, 1
+        // Row major matrix
+        Matrix4 translation = new Matrix4(new double[] {
+                1, 0, 0, 0,
+                0, 1, 0, 0,
+                0, 0, 1, 0,
+                position.x, position.y, position.z, 1
         });
+
+        Matrix4 rotationX = new Matrix4(new double[] {
+                1, 0, 0, 0,
+                0, Math.cos(rotation.x), Math.sin(rotation.x), 0,
+                0, -Math.sin(rotation.x), Math.cos(rotation.x), 0,
+                0, 0, 0, 1
+        });
+
+        Matrix4 rotationY = new Matrix4(new double[] {
+                Math.cos(rotation.y), 0, -Math.sin(rotation.y), 0,
+                0, 1, 0, 0,
+                Math.sin(rotation.y), 0, Math.cos(rotation.y), 0,
+                0, 0, 0, 1
+        });
+
+        return translation.mul(rotationX).mul(rotationY);
     }
 }

@@ -26,16 +26,17 @@ public abstract class ElliotEngine {
 
     public void run() {
         if (!isSetup) {
-            // Setup engine
-            setup();
             // Setup renderer
             renderer = new RenderingEngine(this);
             // Setup window
             windowManager = new WindowManager(this);
             windowManager.setup();
             // Setup input
-            inputManager = new InputManager();
+            inputManager = new InputManager(this);
             inputManager.setup();
+
+            // Setup engine
+            setup();
 
             isSetup = true;
         }

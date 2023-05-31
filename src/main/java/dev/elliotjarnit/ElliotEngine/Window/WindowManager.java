@@ -42,4 +42,8 @@ public class WindowManager {
     public Vector2 getScreenSize() {
         return new Vector2(window.getWidth(), window.getHeight());
     }
+
+    public JFrame getWindow() {
+        return window;
+    }
 }
