@@ -4,16 +4,14 @@ import dev.elliotjarnit.ElliotEngine.Graphics.Color;
 import dev.elliotjarnit.ElliotEngine.Utils.Vector3;
 
 public class ETetrahedron extends EObject {
-    private final double width;
-    private final double height;
-    private final Vector3 origin;
+    private double width;
+    private double height;
     private Color color;
 
     public ETetrahedron() {
         super();
         this.width = 100;
         this.height = 100;
-        this.origin = new Vector3(0, 0, 0);
         this.color = Color.WHITE;
         calculateFaces();
     }
@@ -21,7 +19,6 @@ public class ETetrahedron extends EObject {
         super(origin);
         this.width = 100;
         this.height = 100;
-        this.origin = new Vector3(0, 0, 0);
         this.color = Color.WHITE;
         calculateFaces();
     }
@@ -29,7 +26,6 @@ public class ETetrahedron extends EObject {
         super(origin);
         this.width = width;
         this.height = height;
-        this.origin = origin;
         this.color = Color.WHITE;
         calculateFaces();
     }
@@ -37,7 +33,6 @@ public class ETetrahedron extends EObject {
         super(origin);
         this.width = width;
         this.height = height;
-        this.origin = origin;
         this.color = color;
         calculateFaces();
     }
@@ -45,7 +40,6 @@ public class ETetrahedron extends EObject {
         super(origin);
         this.width = 100;
         this.height = 100;
-        this.origin = origin;
         this.color = color;
         calculateFaces();
     }
@@ -53,6 +47,7 @@ public class ETetrahedron extends EObject {
 
 
     private void calculateFaces() {
+        Vector3 origin = new Vector3(0, 0, 0);
         EFace[] faces = new EFace[4];
 
         // Origin is center of bottom face
@@ -77,28 +72,24 @@ public class ETetrahedron extends EObject {
     public double getWidth() {
         return width;
     }
+    public void setWidth(double width) {
+        this.width = width;
+        calculateFaces();
+    }
 
     public double getHeight() {
         return height;
+    }
+    public void setHeight(double height) {
+        this.height = height;
+        calculateFaces();
     }
 
     public Color getColor() {
         return color;
     }
-
     public void setColor(Color color) {
         this.color = color;
-        calculateFaces();
-    }
-
-    public Vector3 getOrigin() {
-        return origin;
-    }
-
-    public void setOrigin(Vector3 origin) {
-        this.origin.x = origin.x;
-        this.origin.y = origin.y;
-        this.origin.z = origin.z;
         calculateFaces();
     }
 }

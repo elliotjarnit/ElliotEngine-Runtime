@@ -66,8 +66,21 @@ public class ECamera extends EEntity {
         this.nearDistance = nearDistance;
     }
 
-    public void move(Vector3 direction) {
-        this.setOrigin(this.getOrigin().add(direction));
+    public void moveForward(double distance) {
+        Matrix4 rotationMatrix = this.getRotationMatrix();
+        Vector3 forwardVector = new Vector3(rotationMatrix.get(0, 2), rotationMatrix.get(1, 2), rotationMatrix.get(2, 2));
+        Vector3 change = forwardVector.mul(distance);
+        change.y = 0;
+        this.addOrigin(change);
+    }
+
+    public void moveRight(double distance) {
+        Matrix4 rotationMatrix = this.getRotationMatrix();
+        Vector3 forwardVector = new Vector3(rotationMatrix.get(0, 2), rotationMatrix.get(1, 2), rotationMatrix.get(2, 2));
+        Vector3 rightVector = forwardVector.cross(new Vector3(0, 1, 0));
+        Vector3 change = rightVector.mul(distance);
+        change.y = 0;
+        this.addOrigin(change);
     }
 
     public Matrix4 getPerspectiveProjectionMatrix(double aspectRatio) {
@@ -87,20 +100,8 @@ public class ECamera extends EEntity {
         });
     }
 
-    // Row major
-    public Matrix4 getCameraToWorld() {
-        Vector3 position = this.getOrigin();
-        Vector2 rotation = new Vector2();
-        rotation.x = Math.toRadians(this.getRotation().x);
-        rotation.y = Math.toRadians(this.getRotation().y);
-
-        // Row major matrix
-        Matrix4 translation = new Matrix4(new double[] {
-                1, 0, 0, 0,
-                0, 1, 0, 0,
-                0, 0, 1, 0,
-                position.x, position.y, position.z, 1
-        });
+    public Matrix4 getCameraRotationMatrix() {
+        Vector2 rotation = new Vector2(this.getRotationRadians());
 
         Matrix4 rotationX = new Matrix4(new double[] {
                 1, 0, 0, 0,
@@ -116,6 +117,25 @@ public class ECamera extends EEntity {
                 0, 0, 0, 1
         });
 
-        return translation.mul(rotationX).mul(rotationY);
+        return rotationX.mul(rotationY);
+    }
+
+    public Matrix4 getCameraTranslationMatrix() {
+        Vector3 position = this.getOrigin();
+
+        return new Matrix4(new double[] {
+                1, 0, 0, 0,
+                0, 1, 0, 0,
+                0, 0, 1, 0,
+                position.x, position.y, position.z, 1
+        });
+    }
+
+    public Matrix4 getCameraToWorldMatrix() {
+        return this.getCameraRotationMatrix().mul(this.getCameraTranslationMatrix());
+    }
+
+    public Matrix4 getWorldToCameraMatrix() {
+        return this.getCameraToWorldMatrix().inverse();
     }
 }

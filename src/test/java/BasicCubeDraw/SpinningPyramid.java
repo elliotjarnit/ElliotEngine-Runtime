@@ -23,6 +23,6 @@ public class SpinningPyramid extends ETetrahedron {
 
     @Override
     public void update() {
-        this.setRotation(this.getRotation().add(new Vector2(1, 0.0)));
+        this.setRotationDegrees(this.getRotationDegrees().add(new Vector2(1, 0.0)));
     }
 }

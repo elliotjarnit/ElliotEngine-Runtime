@@ -39,8 +39,23 @@ public class WindowManager {
         renderingEngine = null;
     }
 
-    public Vector2 getScreenSize() {
-        return new Vector2(window.getWidth(), window.getHeight());
+    public Vector2 getWindowSize() {
+        Insets insets = window.getInsets();
+        return new Vector2(window.getWidth() - (insets.left + insets.right), window.getHeight() - (insets.top + insets.bottom));
+    }
+
+    public Vector2 getWindowCenter() {
+        Insets insets = window.getInsets();
+        return new Vector2((window.getWidth() - (insets.left + insets.right)) / 2, (window.getHeight() - (insets.top + insets.bottom)) / 2);
+    }
+
+    public Vector2 getWindowPosition() {
+        return new Vector2(window.getX(), window.getY());
+    }
+
+    public Vector2 getWindowCenterPosition() {
+        Insets insets = window.getInsets();
+        return new Vector2(window.getX() + (window.getWidth() - (insets.left + insets.right)) / 2, window.getY() + (window.getHeight() - (insets.top + insets.bottom)) / 2);
     }
 
     public JFrame getWindow() {

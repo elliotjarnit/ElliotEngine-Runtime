@@ -10,6 +10,7 @@ import dev.elliotjarnit.ElliotEngine.Utils.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class RenderingEngine extends JPanel {
@@ -43,8 +44,7 @@ public class RenderingEngine extends JPanel {
         double aspectRatio = (double) getWidth() / (double) getHeight();
 
         Matrix4 perspectiveProjectionMatrix = scene.getCamera().getPerspectiveProjectionMatrix(aspectRatio);
-        Matrix4 cameraToWorld = scene.getCamera().getCameraToWorld();
-        Matrix4 worldToCamera = cameraToWorld.inverse();
+        Matrix4 worldToCameraMatrix = scene.getCamera().getWorldToCameraMatrix();
 
         double[] zBuffer = new double[img.getWidth() * img.getHeight()];
         Arrays.fill(zBuffer, Double.NEGATIVE_INFINITY);
@@ -52,100 +52,80 @@ public class RenderingEngine extends JPanel {
         // This is the main object loop. Render everything in here.
         // Render all objects
         for (EObject object : scene.getObjects()) {
-            Matrix4 rotationMatrix = object.getRotationMatrix();
+            Matrix4 objectToWorld = object.getObjectToWorldMatrix();
 
             if (object.getFaces() == null) continue;
             if (object.getClass() == ECamera.class) continue;
 
             for (EFace face : object.getFaces()) {
-                Vector3[] points = new Vector3[3];
+                ArrayList<Vector2> pointsToRender = new ArrayList<>();
 
                 // Loop over all points in face
                 // All transformations are applied here
                 for (int i = 1; i <= 3; i++) {
-                    // World space
+                    // Object space
                     Vector3 point = face.getVertices()[i - 1];
 
-                    // Homogeneous world space
-                    Vector4 point4 = new Vector4(point.x, point.y, point.z, 1.0);
+                    // World Space
+                    point = objectToWorld.transform(point);
 
                     // Camera space
-                    point4 = worldToCamera.transform(point4);
+                    point = worldToCameraMatrix.transform(point);
 
-                    point4.x /= point4.w;
-                    point4.y /= point4.w;
-                    point4.z /= point4.w;
-
-                    if (point4.z < 0.0) {
+                    if (point.z < 0.0) {
                         // Point is behind camera
                         continue;
                     }
 
-                    point4.w = 1.0;
+                    Vector4 point4 = new Vector4(point.x, point.y, point.z, 1.0);
 
-                    // Homogeneous clip space
+                    // Clip space
                     point4 = perspectiveProjectionMatrix.transform(point4);
 
-                    // Normalized device coordinates (NDC) space
-                    if (point4.w != 0.0) {
-                        point4.x /= point4.w;
-                        point4.y /= point4.w;
-                        point4.z /= point4.w;
+
+
+                    // Screen space
+                    if (point4.w != 0) {
+                        point.x /= point4.w;
+                        point.y /= point4.w;
+                        point.z /= point4.w;
                     }
 
-                    if (point4.x < -aspectRatio || point4.x > aspectRatio || point4.y < -1.0 || point4.y > 1.0) {
-                        // Point is not in view
+                    if (point.x < -aspectRatio || point.x > aspectRatio || point.y < -1.0 || point.y > 1.0) {
+                        // Point is not visible
                         continue;
                     }
 
                     // Raster space
-                    point4.x = (point4.x + 1.0) * 0.5 * getWidth();
-                    point4.y = (1.0 - point4.y) * 0.5 * getHeight();
+                    point.x = (point.x + 1.0) * 0.5 * getWidth();
+                    point.y = (1.0 - point.y) * 0.5 * getHeight();
 
-                    // Temp draw point
-                    points[i - 1] = new Vector3(point4.x, point4.y, point4.z);
+                    // Add point to list
+                    pointsToRender.add(new Vector2(point.x, point.y));
                 }
 
                 if (!meshMap) {
-
-                    if (points[0] == null || points[1] == null || points[2] == null) {
-                        continue;
-                    }
-
-                    Vector2 p1 = new Vector2(points[0].x, points[0].y);
-                    Vector2 p2 = new Vector2(points[1].x, points[1].y);
-                    Vector2 p3 = new Vector2(points[2].x, points[2].y);
-
-                    for (int y = 0; y < this.getHeight(); ++y) {
-                        for (int x = 0; x < this.getWidth(); ++x) {
-                            Vector2 pixel = new Vector2(x + 0.5, y + 0.5);
-
-                            double w1 = edgeFunction(p2, p3, pixel);
-                            double w2 = edgeFunction(p3, p1, pixel);
-                            double w3 = edgeFunction(p1, p2, pixel);
-
-                            if (w1 >= 0 && w2 >= 0 && w3 >= 0) {
-                                double oneOverZ = points[0].z * w1 + points[1].z * w2 + points[2].z * w3;
-                                double z = 1.0 / oneOverZ;
-
-                                if (z > zBuffer[y * this.getWidth() + x]) {
-                                    zBuffer[y * this.getWidth() + x] = z;
-
-                                    img.setRGB(x, y, face.getColor().toAwtColor().getRGB());
-                                }
-                            }
-                        }
-                    }
+//                    for (int y = 0; y < this.getHeight(); ++y) {
+//                        for (int x = 0; x < this.getWidth(); ++x) {
+//                            Vector2 pixel = new Vector2(x + 0.5, y + 0.5);
+//
+//                            double w1 = edgeFunction(pointsToRender[1], pointsToRender[2], pixel);
+//                            double w2 = edgeFunction(pointsToRender[2], pointsToRender[0], pixel);
+//                            double w3 = edgeFunction(pointsToRender[0], pointsToRender[1], pixel);
+//
+//                            if (w1 >= 0 && w2 >= 0 && w3 >= 0) {
+//                                img.setRGB(x, y, face.getColor().toAwtColor().getRGB());
+//                            }
+//                        }
+//                    }
                 } else {
                     g2d.setColor(Color.WHITE.toAwtColor());
-                    if (points[0] != null && points[1] != null) {
-                        g2d.drawLine((int) points[0].x, (int) points[0].y, (int) points[1].x, (int) points[1].y);
-                    }
-                    if (points[1] != null && points[2] != null) {
-                        g2d.drawLine((int) points[1].x, (int) points[1].y, (int) points[2].x, (int) points[2].y);
-                    }
-                    if (points[2] != null && points[0] != null) {
-                        g2d.drawLine((int) points[2].x, (int) points[2].y, (int) points[0].x, (int) points[0].y);
+
+                    for (int i = 0; i < pointsToRender.size(); i++) {
+                        Vector2 point = pointsToRender.get(i);
+                        Vector2 nextPoint = pointsToRender.get((i + 1) % pointsToRender.size());
+
+                        g2d.drawLine((int) point.x, (int) point.y, (int) nextPoint.x, (int) nextPoint.y);
                     }
                 }
             }
@@ -172,6 +152,7 @@ public class RenderingEngine extends JPanel {
         g.drawString(text, x, y);
     }
 
-    static double edgeFunction(Vector2 a, Vector2 b, Vector2 c)
-    { return (c.x - a.x) * (b.y - a.y) - (c.y - a.y) * (b.x - a.x); }
+    static double edgeFunction(Vector2 a, Vector2 b, Vector2 c) {
+        return (c.x - a.x) * (b.y - a.y) - (c.y - a.y) * (b.x - a.x);
+    }
 }

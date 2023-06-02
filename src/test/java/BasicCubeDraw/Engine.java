@@ -24,10 +24,10 @@ public class Engine extends ElliotEngine {
         this.inputManager.takeoverMouse();
 
         EScene mainScene = new EScene();
-        playerCamera = new ECamera(new Vector3(0.1, 0.1, 0.1), 60.0);
+        playerCamera = new ECamera(new Vector3(0.1, 0.1, -10), 60.0);
         playerCamera.setRenderDistance(1000.0);
         SpinningPyramid myObject = new SpinningPyramid(new Vector3(0, 0, 20), 5, 5, Color.RED);
-        ECube myCube = new ECube(new Vector3(20, 0, 20), 5, 5, 5, Color.CYAN);
+        ECube myCube = new ECube(new Vector3(20, 0, 0), 5, 5, 5, Color.CYAN);
         mainScene.addObject(myObject);
         mainScene.addObject(myCube);
         mainScene.addObject(playerCamera);
@@ -48,33 +48,23 @@ public class Engine extends ElliotEngine {
     @Override
     public void loop() {
         if (this.inputManager.isKeyDown(InputManager.Key.W)) {
-            System.out.println("W");
-            playerCamera.move(new Vector3(0, 0, 0.5));
+            playerCamera.moveForward(0.5);
         }
 
         if (this.inputManager.isKeyDown(InputManager.Key.S)) {
-            playerCamera.move(new Vector3(0, 0, -0.5));
+            playerCamera.moveForward(-0.5);
         }
-
         if (this.inputManager.isKeyDown(InputManager.Key.A)) {
-            playerCamera.move(new Vector3(0.5, 0, 0));
+            playerCamera.moveRight(-0.5);
         }
 
         if (this.inputManager.isKeyDown(InputManager.Key.D)) {
-            playerCamera.move(new Vector3(-0.5, 0, 0));
-        }
-
-        if (this.inputManager.isKeyDown(InputManager.Key.SPACE)) {
-            playerCamera.move(new Vector3(0, 0.5, 0));
-        }
-
-        if (this.inputManager.isKeyDown(InputManager.Key.SHIFT)) {
-            playerCamera.move(new Vector3(0, -0.5, 0));
+            playerCamera.moveRight(0.5);
         }
 
         // Mouse movement
         Vector2 mouseDelta = this.inputManager.getMouseDelta();
 
-        playerCamera.setRotation(playerCamera.getRotation().add(new Vector2(mouseDelta.y * this.sensitivity, mouseDelta.x * this.sensitivity)));
+        playerCamera.setRotationDegrees(playerCamera.getRotationDegrees().add(new Vector2(mouseDelta.y * this.sensitivity, mouseDelta.x * this.sensitivity)));
     }
 }

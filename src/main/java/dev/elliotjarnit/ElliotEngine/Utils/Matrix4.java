@@ -21,6 +21,10 @@ public class Matrix4 {
         }
     }
 
+    public double get(int row, int col) {
+        return this.values[row * 4 + col];
+    }
+
     public Matrix4 mul(Matrix4 other) {
         double[] result = new double[16];
         for (int row = 0; row < 4; row++) {
@@ -41,6 +45,23 @@ public class Matrix4 {
                 in.x * values[2] + in.y * values[6] + in.z * values[10] + in.w * values[14],
                 in.x * values[3] + in.y * values[7] + in.z * values[11] + in.w * values[15]
         );
+    }
+    public Vector3 transform(Vector3 in) {
+        Vector4 vec = new Vector4(in.x, in.y, in.z, 1.0);
+        Vector4 ret = new Vector4(
+                vec.x * values[0] + vec.y * values[4] + vec.z * values[8] + vec.w * values[12],
+                vec.x * values[1] + vec.y * values[5] + vec.z * values[9] + vec.w * values[13],
+                vec.x * values[2] + vec.y * values[6] + vec.z * values[10] + vec.w * values[14],
+                vec.x * values[3] + vec.y * values[7] + vec.z * values[11] + vec.w * values[15]
+        );
+
+        if (ret.w != 0.0) {
+            ret.x /= ret.w;
+            ret.y /= ret.w;
+            ret.z /= ret.w;
+        }
+
+        return new Vector3(ret.x, ret.y, ret.z);
     }
 
     public Matrix4 inverse() {

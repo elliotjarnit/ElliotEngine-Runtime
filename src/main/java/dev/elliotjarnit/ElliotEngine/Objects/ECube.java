@@ -51,56 +51,42 @@ public class ECube extends EObject {
 
     // Faces are triangles
     private void calculateFaces() {
-        Vector3 origin = this.getOrigin();
+        Vector3 origin = new Vector3(0, 0, 0);
         EFace[] faces = new EFace[12];
 
-        // Front face
-        Vector3 frontTopLeft = new Vector3(origin.x - width / 2, origin.y + height / 2, origin.z + depth / 2);
-        Vector3 frontTopRight = new Vector3(origin.x + width / 2, origin.y + height / 2, origin.z + depth / 2);
-        Vector3 frontBottomLeft = new Vector3(origin.x - width / 2, origin.y - height / 2, origin.z + depth / 2);
-        Vector3 frontBottomRight = new Vector3(origin.x + width / 2, origin.y - height / 2, origin.z + depth / 2);
-        faces[0] = new EFace(frontTopLeft, frontTopRight, frontBottomLeft, color);
-        faces[1] = new EFace(frontTopRight, frontBottomLeft, frontBottomRight, color);
+        // Points
+        Vector3 backLeftBottom = new Vector3(origin.x - this.width / 2, origin.y - this.height / 2, origin.z - this.depth / 2);
+        Vector3 backRightBottom = new Vector3(origin.x + this.width / 2, origin.y - this.height / 2, origin.z - this.depth / 2);
+        Vector3 backLeftTop = new Vector3(origin.x - this.width / 2, origin.y + this.height / 2, origin.z - this.depth / 2);
+        Vector3 backRightTop = new Vector3(origin.x + this.width / 2, origin.y + this.height / 2, origin.z - this.depth / 2);
+        Vector3 frontLeftBottom = new Vector3(origin.x - this.width / 2, origin.y - this.height / 2, origin.z + this.depth / 2);
+        Vector3 frontRightBottom = new Vector3(origin.x + this.width / 2, origin.y - this.height / 2, origin.z + this.depth / 2);
+        Vector3 frontLeftTop = new Vector3(origin.x - this.width / 2, origin.y + this.height / 2, origin.z + this.depth / 2);
+        Vector3 frontRightTop = new Vector3(origin.x + this.width / 2, origin.y + this.height / 2, origin.z + this.depth / 2);
 
         // Back face
-        Vector3 backTopLeft = new Vector3(origin.x - width / 2, origin.y + height / 2, origin.z - depth / 2);
-        Vector3 backTopRight = new Vector3(origin.x + width / 2, origin.y + height / 2, origin.z - depth / 2);
-        Vector3 backBottomLeft = new Vector3(origin.x - width / 2, origin.y - height / 2, origin.z - depth / 2);
-        Vector3 backBottomRight = new Vector3(origin.x + width / 2, origin.y - height / 2, origin.z - depth / 2);
-        faces[2] = new EFace(backTopLeft, backTopRight, backBottomLeft, color);
-        faces[3] = new EFace(backTopRight, backBottomLeft, backBottomRight, color);
+        faces[0] = new EFace(backLeftBottom, backRightBottom, backLeftTop, this.color);
+        faces[1] = new EFace(backRightBottom, backRightTop, backLeftTop, this.color);
+
+        // Front face
+        faces[2] = new EFace(frontLeftBottom, frontRightBottom, frontLeftTop, this.color);
+        faces[3] = new EFace(frontRightBottom, frontRightTop, frontLeftTop, this.color);
 
         // Left face
-        Vector3 leftTopLeft = new Vector3(origin.x - width / 2, origin.y + height / 2, origin.z + depth / 2);
-        Vector3 leftTopRight = new Vector3(origin.x - width / 2, origin.y + height / 2, origin.z - depth / 2);
-        Vector3 leftBottomLeft = new Vector3(origin.x - width / 2, origin.y - height / 2, origin.z + depth / 2);
-        Vector3 leftBottomRight = new Vector3(origin.x - width / 2, origin.y - height / 2, origin.z - depth / 2);
-        faces[4] = new EFace(leftTopLeft, leftTopRight, leftBottomLeft, color);
-        faces[5] = new EFace(leftTopRight, leftBottomLeft, leftBottomRight, color);
+        faces[4] = new EFace(backLeftBottom, frontLeftBottom, backLeftTop, this.color);
+        faces[5] = new EFace(frontLeftBottom, frontLeftTop, backLeftTop, this.color);
 
         // Right face
-        Vector3 rightTopLeft = new Vector3(origin.x + width / 2, origin.y + height / 2, origin.z + depth / 2);
-        Vector3 rightTopRight = new Vector3(origin.x + width / 2, origin.y + height / 2, origin.z - depth / 2);
-        Vector3 rightBottomLeft = new Vector3(origin.x + width / 2, origin.y - height / 2, origin.z + depth / 2);
-        Vector3 rightBottomRight = new Vector3(origin.x + width / 2, origin.y - height / 2, origin.z - depth / 2);
-        faces[6] = new EFace(rightTopLeft, rightTopRight, rightBottomLeft, color);
-        faces[7] = new EFace(rightTopRight, rightBottomLeft, rightBottomRight, color);
-
-        // Top face
-        Vector3 topTopLeft = new Vector3(origin.x - width / 2, origin.y + height / 2, origin.z + depth / 2);
-        Vector3 topTopRight = new Vector3(origin.x + width / 2, origin.y + height / 2, origin.z + depth / 2);
-        Vector3 topBottomLeft = new Vector3(origin.x - width / 2, origin.y + height / 2, origin.z - depth / 2);
-        Vector3 topBottomRight = new Vector3(origin.x + width / 2, origin.y + height / 2, origin.z - depth / 2);
-        faces[8] = new EFace(topTopLeft, topTopRight, topBottomLeft, color);
-        faces[9] = new EFace(topTopRight, topBottomLeft, topBottomRight, color);
+        faces[6] = new EFace(backRightBottom, frontRightBottom, backRightTop, this.color);
+        faces[7] = new EFace(frontRightBottom, frontRightTop, backRightTop, this.color);
 
         // Bottom face
-        Vector3 bottomTopLeft = new Vector3(origin.x - width / 2, origin.y - height / 2, origin.z + depth / 2);
-        Vector3 bottomTopRight = new Vector3(origin.x + width / 2, origin.y - height / 2, origin.z + depth / 2);
-        Vector3 bottomBottomLeft = new Vector3(origin.x - width / 2, origin.y - height / 2, origin.z - depth / 2);
-        Vector3 bottomBottomRight = new Vector3(origin.x + width / 2, origin.y - height / 2, origin.z - depth / 2);
-        faces[10] = new EFace(bottomTopLeft, bottomTopRight, bottomBottomLeft, color);
-        faces[11] = new EFace(bottomTopRight, bottomBottomLeft, bottomBottomRight, color);
+        faces[8] = new EFace(backLeftBottom, backRightBottom, frontLeftBottom, this.color);
+        faces[9] = new EFace(backRightBottom, frontRightBottom, frontLeftBottom, this.color);
+
+        // Top face
+        faces[10] = new EFace(backLeftTop, backRightTop, frontLeftTop, this.color);
+        faces[11] = new EFace(backRightTop, frontRightTop, frontLeftTop, this.color);
 
         this.setFaces(faces);
     }

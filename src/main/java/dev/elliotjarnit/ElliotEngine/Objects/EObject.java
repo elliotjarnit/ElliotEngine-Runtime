@@ -41,9 +41,20 @@ public abstract class EObject {
     public Vector3 getOrigin() {
         return this.origin;
     }
-
     public void setOrigin(Vector3 position) {
         this.origin = position;
+    }
+    public void addOrigin(Vector3 position) {
+        this.setOrigin(this.origin.add(position));
+    }
+    public void subtractOrigin(Vector3 position) {
+        this.setOrigin(this.origin.sub(position));
+    }
+    public void multiplyOrigin(Vector3 position) {
+        this.setOrigin(this.origin.mul(position));
+    }
+    public void divideOrigin(Vector3 position) {
+        this.setOrigin(this.origin.div(position));
     }
 
     public void setOrigin(int x, int y, int z) {
@@ -74,12 +85,18 @@ public abstract class EObject {
         return (int) this.origin.z;
     }
 
-    public void setRotation(Vector2 rotation) {
+    public void setRotationDegrees(Vector2 rotation) {
         this.rotation = rotation;
     }
+    public void setRotationRadians(Vector2 rotation) {
+        this.rotation = new Vector2(Math.toDegrees(rotation.x), Math.toDegrees(rotation.y));
+    }
 
-    public Vector2 getRotation() {
+    public Vector2 getRotationDegrees() {
         return this.rotation;
+    }
+    public Vector2 getRotationRadians() {
+        return new Vector2(Math.toRadians(this.rotation.x), Math.toRadians(this.rotation.y));
     }
 
     public void show() {
@@ -116,18 +133,37 @@ public abstract class EObject {
     }
 
     public Matrix4 getRotationMatrix() {
+        Vector2 rotation = this.getRotationRadians();
+
         Matrix4 xRotation = new Matrix4(new double[] {
                 1.0, 0.0, 0.0, 0.0,
-                0.0, Math.cos(this.getRotation().x), -Math.sin(this.getRotation().x), 0.0,
-                0.0, Math.sin(this.getRotation().x), Math.cos(this.getRotation().x), 0.0,
+                0.0, Math.cos(rotation.x), -Math.sin(rotation.x), 0.0,
+                0.0, Math.sin(rotation.x), Math.cos(rotation.x), 0.0,
                 0.0, 0.0, 0.0, 1.0
         });
+
         Matrix4 yRotation = new Matrix4(new double[] {
-                Math.cos(this.getRotation().y), 0.0, Math.sin(this.getRotation().y), 0.0,
+                Math.cos(rotation.y), 0.0, Math.sin(rotation.y), 0.0,
                 0.0, 1.0, 0.0, 0.0,
-                -Math.sin(this.getRotation().y), 0.0, Math.cos(this.getRotation().y), 0.0,
+                -Math.sin(rotation.y), 0.0, Math.cos(rotation.y), 0.0,
                 0.0, 0.0, 0.0, 1.0
         });
+
         return xRotation.mul(yRotation);
+    }
+
+    public Matrix4 getTranslationMatrix() {
+        Vector3 origin = this.getOrigin();
+
+        return new Matrix4(new double[] {
+                1.0, 0.0, 0.0, 0.0,
+                0.0, 1.0, 0.0, 0.0,
+                0.0, 0.0, 1.0, 0.0,
+                origin.x, origin.y, origin.z, 1.0
+        });
+    }
+
+    public Matrix4 getObjectToWorldMatrix() {
+        return this.getRotationMatrix().mul(this.getTranslationMatrix());
     }
 }

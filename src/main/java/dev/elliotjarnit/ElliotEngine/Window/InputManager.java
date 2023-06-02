@@ -16,9 +16,9 @@ public class InputManager {
     private KeyboardDispatcher keyDispatcher;
     private MouseDispatcher mouseDispatcher;
     private Robot robot;
+    private boolean mouseTaken = false;
     private final Map<Key, Boolean> keyDown = new HashMap<>();
-    private Vector2 mouseLast = new Vector2(0, 0);
-    private Vector2 mouse = new Vector2(0, 0);
+    private Vector2 mouseMoved = new Vector2(0, 0);
 
     public InputManager(ElliotEngine engine) {
         this.engine = engine;
@@ -49,7 +49,17 @@ public class InputManager {
     }
 
     public Vector2 getMouseDelta() {
-        return mouse.sub(mouseLast);
+        if (!mouseTaken) return new Vector2(0, 0);
+        if (!engine.windowManager.getWindow().hasFocus()) return new Vector2(0, 0);
+
+        Vector2 mouseDelta = new Vector2(mouseMoved);
+        if (engine.getPlatform().toLowerCase().contains("mac os")) {
+            mouseDelta.y += 37;
+        }
+        mouseDelta.x *= -1;
+        mouseDelta.y *= -1;
+        this.mouseDispatcher.moveMouseToMiddle();
+        return mouseDelta;
     }
 
     public void takeoverMouse() {
@@ -57,6 +67,8 @@ public class InputManager {
                 new BufferedImage(3, 3, BufferedImage.TYPE_INT_ARGB), new Point(0, 0), "null"));
 
         this.engine.windowManager.getWindow().setFocusTraversalKeysEnabled(false);
+
+        mouseTaken = true;
     }
 
     private class KeyboardDispatcher implements KeyEventDispatcher {
@@ -79,11 +91,23 @@ public class InputManager {
 
         @Override
         public void mouseMoved(MouseEvent e) {
-            mouseLast = mouse;
-            mouse = new Vector2(e.getX(), e.getY());
+            if (mouseTaken) {
+                // Get distance from middle of window
+                Vector2 windowCenter = engine.windowManager.getWindowCenterPosition();
+                mouseMoved = new Vector2(e.getX() - windowCenter.x, e.getY() - windowCenter.y);
+            }
         }
         @Override
         public void mouseDragged(MouseEvent e) {
+        }
+
+        public void moveMouseToMiddle() {
+            // Check if window focused
+            if (engine.windowManager.getWindow().hasFocus()) {
+                Vector2 windowCenter = engine.windowManager.getWindowCenterPosition();
+                robot.mouseMove((int) windowCenter.x, (int) windowCenter.y);
+                mouseMoved = new Vector2(0, 0);
+            }
         }
 
 

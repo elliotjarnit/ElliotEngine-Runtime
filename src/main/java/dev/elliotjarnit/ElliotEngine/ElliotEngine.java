@@ -71,4 +71,8 @@ public abstract class ElliotEngine {
     public void setScene(EScene scene) {
         currentScene = scene;
     }
+
+    public String getPlatform() {
+        return System.getProperty("os.name");
+    }
 }
