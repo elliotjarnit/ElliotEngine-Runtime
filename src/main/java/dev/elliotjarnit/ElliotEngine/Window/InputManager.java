@@ -53,7 +53,7 @@ public class InputManager {
         if (!engine.windowManager.getWindow().hasFocus()) return new Vector2(0, 0);
 
         Vector2 mouseDelta = new Vector2(mouseMoved);
-        if (engine.getPlatform().toLowerCase().contains("mac os")) {
+        if (engine.getPlatform() == ElliotEngine.Platform.MAC) {
             mouseDelta.y += 37;
         }
         mouseDelta.x *= -1;

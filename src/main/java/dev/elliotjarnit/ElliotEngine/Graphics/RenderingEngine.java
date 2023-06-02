@@ -17,12 +17,12 @@ public class RenderingEngine extends JPanel {
     private EScene scene;
     private final ElliotEngine engine;
     private final boolean meshMap = true;
+    private final int MAX_POINTS;
 
     public RenderingEngine(ElliotEngine engine) {
         super();
         this.engine = engine;
-
-        // JPanel options here
+        MAX_POINTS = Integer.parseInt(this.engine.getOption(ElliotEngine.AdvancedOptions.MAX_CLIPPING_VERTEXES));
     }
 
     @Override
@@ -82,8 +82,6 @@ public class RenderingEngine extends JPanel {
                     // Clip space
                     point4 = perspectiveProjectionMatrix.transform(point4);
 
-
-
                     // Screen space
                     if (point4.w != 0) {
                         point.x /= point4.w;
@@ -103,6 +101,17 @@ public class RenderingEngine extends JPanel {
                     // Add point to list
                     pointsToRender.add(new Vector2(point.x, point.y));
                 }
+
+                Vector2[] clipperPoints = new Vector2[4];
+                clipperPoints[0] = new Vector2(0, 0);
+                clipperPoints[1] = new Vector2(getWidth(), 0);
+                clipperPoints[2] = new Vector2(getWidth(), getHeight());
+                clipperPoints[3] = new Vector2(0, getHeight());
+
+                Vector2[] pointsToRenderArray = new Vector2[pointsToRender.size()];
+                pointsToRenderArray = pointsToRender.toArray(pointsToRenderArray);
+
+//                this.suthHodgClip(pointsToRenderArray, clipperPoints);
 
                 if (!meshMap) {
 //                    for (int y = 0; y < this.getHeight(); ++y) {
@@ -152,7 +161,78 @@ public class RenderingEngine extends JPanel {
         g.drawString(text, x, y);
     }
 
-    static double edgeFunction(Vector2 a, Vector2 b, Vector2 c) {
+    public double edgeFunction(Vector2 a, Vector2 b, Vector2 c) {
         return (c.x - a.x) * (b.y - a.y) - (c.y - a.y) * (b.x - a.x);
+    }
+
+    public double x_intersect(Vector2[] line1, Vector2[] line2) {
+        double num = (line1[0].x * line1[1].y - line1[0].y * line1[1].x) * (line2[0].x - line2[1].x) - (line1[0].x - line1[1].x) * (line2[0].x * line2[1].y - line2[0].y * line2[1].x);
+        double den = (line1[0].x - line1[1].x) * (line2[0].y - line2[1].y) - (line1[0].y - line1[1].y) * (line2[0].x - line2[1].x);
+        return num / den;
+    }
+
+    public double y_intersect(Vector2[] line1, Vector2[] line2) {
+        double num = (line1[0].x * line1[1].y - line1[0].y * line1[1].x) * (line2[0].y - line2[1].y) - (line1[0].y - line1[1].y) * (line2[0].x * line2[1].y - line2[0].y * line2[1].x);
+        double den = (line1[0].x - line1[1].x) * (line2[0].y - line2[1].y) - (line1[0].y - line1[1].y) * (line2[0].x - line2[1].x);
+        return num / den;
+    }
+
+    public void clip(Vector2[] polyPoints, int x1, int y1, int x2, int y2) {
+        Vector2[] newPoints = new Vector2[MAX_POINTS];
+        int newPolySize = 0;
+
+        for (int i = 0; i < polyPoints.length; i++) {
+            int k = (i + 1) % polyPoints.length;
+            int ix = (int) polyPoints[i].x, iy = (int) polyPoints[i].y;
+            int kx = (int) polyPoints[k].y, ky = (int) polyPoints[k].y;
+
+            int iPos = (x2 - x1) * (iy - y1) - (y2 - y1) * (ix - x1);
+            int kPos = (x2 - x1) * (ky - y1) - (y2 - y1) * (kx - x1);
+
+            if (iPos < 0 && kPos < 0) {
+                newPoints[newPolySize].x = kx;
+                newPoints[newPolySize].y = ky;
+                newPolySize++;
+            } else if (iPos >= 0 && kPos < 0) {
+                newPoints[newPolySize].x = xIntersect(x1, y1, x2, y2, ix, iy, kx, ky);
+                newPoints[newPolySize].y = yIntersect(x1, y1, x2, y2, ix, iy, kx, ky);
+                newPolySize++;
+
+                newPoints[newPolySize].x = kx;
+                newPoints[newPolySize].y = ky;
+                newPolySize++;
+            } else if (iPos < 0 && kPos >= 0) {
+                newPoints[newPolySize].x = xIntersect(x1, y1, x2, y2, ix, iy, kx, ky);
+                newPoints[newPolySize].y = yIntersect(x1, y1, x2, y2, ix, iy, kx, ky);
+                newPolySize++;
+            }
+        }
+
+        for (int i = 0; i < newPolySize; i++) {
+            polyPoints[i].x = newPoints[i].x;
+            polyPoints[i].y = newPoints[i].y;
+        }
+    }
+
+    public int xIntersect(int x1, int y1, int x2, int y2,
+                          int ix, int iy, int kx, int ky) {
+        return ((x1 * y2 - y1 * x2) * (ix - kx) - (x1 - x2) * (ix * ky - iy * kx)) /
+                ((x1 - x2) * (iy - ky) - (y1 - y2) * (ix - kx));
+    }
+
+    public int yIntersect(int x1, int y1, int x2, int y2,
+                          int ix, int iy, int kx, int ky) {
+        return ((x1 * y2 - y1 * x2) * (iy - ky) - (y1 - y2) * (ix * ky - iy * kx)) /
+                ((x1 - x2) * (iy - ky) - (y1 - y2) * (ix - kx));
+    }
+
+    public void suthHodgClip(Vector2[] polyPoints, Vector2[] clipperPoints) {
+        for (int i = 0; i < clipperPoints.length; i++) {
+            int k = (i + 1) % clipperPoints.length;
+
+            clip(polyPoints, (int) clipperPoints[i].x,
+                    (int) clipperPoints[i].y, (int) clipperPoints[k].x,
+                    (int) clipperPoints[k].y);
+        }
     }
 }

@@ -19,6 +19,17 @@ public class Engine extends ElliotEngine {
         engine.run();
     }
 
+
+    @Override
+    public void optionSetup() {
+        this.setOption(Options.NAME, "Basic Cube Draw Demo");
+        this.setOption(Options.DESCRIPTION, "A  very simple demo of ElliotEngine");
+        this.setOption(Options.VERSION, "0.0.1");
+        this.setOption(Options.WINDOW_WIDTH, "800");
+        this.setOption(Options.WINDOW_HEIGHT, "600");
+        this.setOption(AdvancedOptions.MAX_CLIPPING_VERTEXES, "20");
+    }
+
     @Override
     public void setup() {
         this.inputManager.takeoverMouse();

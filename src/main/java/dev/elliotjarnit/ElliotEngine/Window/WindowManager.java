@@ -19,8 +19,10 @@ public class WindowManager {
 
     public void setup() {
         // Setup window
-        window = new JFrame(this.engine.getClass().getSimpleName());
-        window.setSize(800, 600);
+        window = new JFrame(this.engine.getOption(ElliotEngine.Options.NAME));
+        String width = this.engine.getOption(ElliotEngine.Options.WINDOW_WIDTH);
+        String height = this.engine.getOption(ElliotEngine.Options.WINDOW_HEIGHT);
+        window.setSize(Integer.parseInt(width), Integer.parseInt(height));
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         // Setup renderer
         Container pane = window.getContentPane();
