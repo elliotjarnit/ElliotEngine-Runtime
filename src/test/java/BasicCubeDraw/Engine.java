@@ -2,6 +2,7 @@ package BasicCubeDraw;
 
 import dev.elliotjarnit.ElliotEngine.ElliotEngine;
 import dev.elliotjarnit.ElliotEngine.Objects.ECamera;
+import dev.elliotjarnit.ElliotEngine.Objects.EFace;
 import dev.elliotjarnit.ElliotEngine.Objects.EScene;
 import dev.elliotjarnit.ElliotEngine.Objects.ECube;
 import dev.elliotjarnit.ElliotEngine.Graphics.Color;
@@ -12,7 +13,7 @@ import dev.elliotjarnit.ElliotEngine.Window.InputManager;
 
 public class Engine extends ElliotEngine {
     private ECamera playerCamera;
-    private double sensitivity = 0.3;
+    private double sensitivity = 0.5;
 
     public static void main(String[] args) {
         Engine engine = new Engine();
@@ -26,8 +27,7 @@ public class Engine extends ElliotEngine {
         this.setOption(Options.DESCRIPTION, "A  very simple demo of ElliotEngine");
         this.setOption(Options.VERSION, "0.0.1");
         this.setOption(Options.WINDOW_WIDTH, "800");
-        this.setOption(Options.WINDOW_HEIGHT, "600");
-        this.setOption(AdvancedOptions.MAX_CLIPPING_VERTEXES, "20");
+        this.setOption(Options.WINDOW_HEIGHT, "800");
     }
 
     @Override
@@ -35,12 +35,18 @@ public class Engine extends ElliotEngine {
         this.inputManager.takeoverMouse();
 
         EScene mainScene = new EScene();
-        playerCamera = new ECamera(new Vector3(0.1, 0.1, -10), 60.0);
+        playerCamera = new ECamera(new Vector3(0.1, 2, -10), 60.0);
         playerCamera.setRenderDistance(1000.0);
-        SpinningPyramid myObject = new SpinningPyramid(new Vector3(0, 0, 20), 5, 5, Color.RED);
+        SpinningPyramid myObject = new SpinningPyramid(new Vector3(0, 0, 50), 5, 5, Color.RED);
+        KnightPiece knight1 = new KnightPiece(new Vector3(0, 0, 20));
         ECube myCube = new ECube(new Vector3(20, 0, 0), 5, 5, 5, Color.CYAN);
+        System.out.println("Cube");
+        for (EFace face : myCube.getFaces()) {
+            System.out.println(face);
+        }
         mainScene.addObject(myObject);
         mainScene.addObject(myCube);
+        mainScene.addObject(knight1);
         mainScene.addObject(playerCamera);
         mainScene.setCamera(playerCamera);
         this.setScene(mainScene);

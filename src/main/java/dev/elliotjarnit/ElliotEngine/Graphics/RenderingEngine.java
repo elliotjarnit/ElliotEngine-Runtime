@@ -16,7 +16,7 @@ import java.util.Arrays;
 public class RenderingEngine extends JPanel {
     private EScene scene;
     private final ElliotEngine engine;
-    private final boolean meshMap = true;
+    private final boolean meshMap = false;
     private final int MAX_POINTS;
 
     public RenderingEngine(ElliotEngine engine) {
@@ -58,13 +58,14 @@ public class RenderingEngine extends JPanel {
             if (object.getClass() == ECamera.class) continue;
 
             for (EFace face : object.getFaces()) {
-                ArrayList<Vector2> pointsToRender = new ArrayList<>();
+                ArrayList<Vector3> pointsToRender = new ArrayList<>();
 
                 // Loop over all points in face
                 // All transformations are applied here
                 for (int i = 1; i <= 3; i++) {
                     // Object space
-                    Vector3 point = face.getVertices()[i - 1];
+                    Vector3 point = new Vector3(face.getVertices()[i - 1]);
+                    point.y *= -1;
 
                     // World Space
                     point = objectToWorld.transform(point);
@@ -72,15 +73,14 @@ public class RenderingEngine extends JPanel {
                     // Camera space
                     point = worldToCameraMatrix.transform(point);
 
-                    if (point.z < 0.0) {
-                        // Point is behind camera
-                        continue;
-                    }
+                    if (point.z < 0) continue;
 
                     Vector4 point4 = new Vector4(point.x, point.y, point.z, 1.0);
 
                     // Clip space
                     point4 = perspectiveProjectionMatrix.transform(point4);
+
+                    double z = point4.z;
 
                     // Screen space
                     if (point4.w != 0) {
@@ -89,50 +89,45 @@ public class RenderingEngine extends JPanel {
                         point.z /= point4.w;
                     }
 
-                    if (point.x < -aspectRatio || point.x > aspectRatio || point.y < -1.0 || point.y > 1.0) {
-                        // Point is not visible
-                        continue;
-                    }
-
                     // Raster space
                     point.x = (point.x + 1.0) * 0.5 * getWidth();
                     point.y = (1.0 - point.y) * 0.5 * getHeight();
 
                     // Add point to list
-                    pointsToRender.add(new Vector2(point.x, point.y));
+                    pointsToRender.add(new Vector3(point.x, point.y, z));
                 }
 
-                Vector2[] clipperPoints = new Vector2[4];
-                clipperPoints[0] = new Vector2(0, 0);
-                clipperPoints[1] = new Vector2(getWidth(), 0);
-                clipperPoints[2] = new Vector2(getWidth(), getHeight());
-                clipperPoints[3] = new Vector2(0, getHeight());
-
-                Vector2[] pointsToRenderArray = new Vector2[pointsToRender.size()];
-                pointsToRenderArray = pointsToRender.toArray(pointsToRenderArray);
-
-//                this.suthHodgClip(pointsToRenderArray, clipperPoints);
-
                 if (!meshMap) {
-//                    for (int y = 0; y < this.getHeight(); ++y) {
-//                        for (int x = 0; x < this.getWidth(); ++x) {
-//                            Vector2 pixel = new Vector2(x + 0.5, y + 0.5);
-//
-//                            double w1 = edgeFunction(pointsToRender[1], pointsToRender[2], pixel);
-//                            double w2 = edgeFunction(pointsToRender[2], pointsToRender[0], pixel);
-//                            double w3 = edgeFunction(pointsToRender[0], pointsToRender[1], pixel);
-//
-//                            if (w1 >= 0 && w2 >= 0 && w3 >= 0) {
-//                                img.setRGB(x, y, face.getColor().toAwtColor().getRGB());
-//                            }
-//                        }
-//                    }
+                    if (pointsToRender.size() != 3) continue;
+                    int minX = (int) Math.max(0, Math.ceil(Math.min(pointsToRender.get(0).x, Math.min(pointsToRender.get(1).x, pointsToRender.get(2).x))));
+                    int maxX = (int) Math.min(img.getWidth() - 1, Math.floor(Math.max(pointsToRender.get(0).x, Math.max(pointsToRender.get(1).x, pointsToRender.get(2).x))));
+                    int minY = (int) Math.max(0, Math.ceil(Math.min(pointsToRender.get(0).y, Math.min(pointsToRender.get(1).y, pointsToRender.get(2).y))));
+                    int maxY = (int) Math.min(img.getHeight() - 1, Math.floor(Math.max(pointsToRender.get(0).y, Math.max(pointsToRender.get(1).y, pointsToRender.get(2).y))));
+
+                    for (int y = minY; y <= maxY; y++) {
+                        for (int x = minX; x <= maxX; x++) {
+                            Vector3 p = new Vector3(x, y, 0);
+
+                            boolean V1 = sameSide(pointsToRender.get(0), pointsToRender.get(1), pointsToRender.get(2), p);
+                            boolean V2 = sameSide(pointsToRender.get(1), pointsToRender.get(2), pointsToRender.get(0), p);
+                            boolean V3 = sameSide(pointsToRender.get(2), pointsToRender.get(0), pointsToRender.get(1), p);
+
+                            if (V1 && V2 && V3) {
+                                double depth = pointsToRender.get(0).z + pointsToRender.get(1).z + pointsToRender.get(2).z;
+                                int zIndex = y * img.getWidth() + x;
+                                if (zBuffer[zIndex] < depth) {
+                                    img.setRGB(x, y, face.getColor().toAwtColor().getRGB());
+                                    zBuffer[zIndex] = depth;
+                                }
+                            }
+                        }
+                    }
                 } else {
                     g2d.setColor(Color.WHITE.toAwtColor());
 
                     for (int i = 0; i < pointsToRender.size(); i++) {
-                        Vector2 point = pointsToRender.get(i);
-                        Vector2 nextPoint = pointsToRender.get((i + 1) % pointsToRender.size());
+                        Vector3 point = pointsToRender.get(i);
+                        Vector3 nextPoint = pointsToRender.get((i + 1) % pointsToRender.size());
 
                         g2d.drawLine((int) point.x, (int) point.y, (int) nextPoint.x, (int) nextPoint.y);
                     }
@@ -161,8 +156,17 @@ public class RenderingEngine extends JPanel {
         g.drawString(text, x, y);
     }
 
-    public double edgeFunction(Vector2 a, Vector2 b, Vector2 c) {
-        return (c.x - a.x) * (b.y - a.y) - (c.y - a.y) * (b.x - a.x);
+    static boolean sameSide(Vector3 A, Vector3 B, Vector3 C, Vector3 p){
+        Vector3 V1V2 = new Vector3(B.x - A.x,B.y - A.y,B.z - A.z);
+        Vector3 V1V3 = new Vector3(C.x - A.x,C.y - A.y,C.z - A.z);
+        Vector3 V1P = new Vector3(p.x - A.x,p.y - A.y,p.z - A.z);
+
+        // If the cross product of vector V1V2 and vector V1V3 is the same as the one of vector V1V2 and vector V1p, they are on the same side.
+        // We only need to judge the direction of z
+        double V1V2CrossV1V3 = V1V2.x * V1V3.y - V1V3.x * V1V2.y;
+        double V1V2CrossP = V1V2.x * V1P.y - V1P.x * V1V2.y;
+
+        return V1V2CrossV1V3 * V1V2CrossP >= 0;
     }
 
     public double x_intersect(Vector2[] line1, Vector2[] line2) {

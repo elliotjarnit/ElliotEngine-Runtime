@@ -28,9 +28,20 @@ public class Vector2 {
     public Vector2 mul(Vector2 v) {
         return new Vector2(this.x * v.x, this.y * v.y);
     }
+    public Vector2 mul(double d) {
+        return new Vector2(this.x * d, this.y * d);
+    }
 
     public Vector2 div(Vector2 v) {
         return new Vector2(this.x / v.x, this.y / v.y);
+    }
+
+    public Vector2 normalize() {
+        return new Vector2(this.x / this.length(), this.y / this.length());
+    }
+
+    public int length() {
+        return (int) Math.sqrt(this.x * this.x + this.y * this.y);
     }
 
     public String toString() {

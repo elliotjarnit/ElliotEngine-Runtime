@@ -1,8 +1,6 @@
 package dev.elliotjarnit.ElliotEngine.Objects;
 
 import dev.elliotjarnit.ElliotEngine.Graphics.Color;
-import dev.elliotjarnit.ElliotEngine.Objects.EFace;
-import dev.elliotjarnit.ElliotEngine.Objects.EObject;
 import dev.elliotjarnit.ElliotEngine.Utils.Vector3;
 
 public class ECube extends EObject {
@@ -54,15 +52,18 @@ public class ECube extends EObject {
         Vector3 origin = new Vector3(0, 0, 0);
         EFace[] faces = new EFace[12];
 
+        // Origin is the center of the bottom face
+
         // Points
-        Vector3 backLeftBottom = new Vector3(origin.x - this.width / 2, origin.y - this.height / 2, origin.z - this.depth / 2);
-        Vector3 backRightBottom = new Vector3(origin.x + this.width / 2, origin.y - this.height / 2, origin.z - this.depth / 2);
-        Vector3 backLeftTop = new Vector3(origin.x - this.width / 2, origin.y + this.height / 2, origin.z - this.depth / 2);
-        Vector3 backRightTop = new Vector3(origin.x + this.width / 2, origin.y + this.height / 2, origin.z - this.depth / 2);
-        Vector3 frontLeftBottom = new Vector3(origin.x - this.width / 2, origin.y - this.height / 2, origin.z + this.depth / 2);
-        Vector3 frontRightBottom = new Vector3(origin.x + this.width / 2, origin.y - this.height / 2, origin.z + this.depth / 2);
-        Vector3 frontLeftTop = new Vector3(origin.x - this.width / 2, origin.y + this.height / 2, origin.z + this.depth / 2);
-        Vector3 frontRightTop = new Vector3(origin.x + this.width / 2, origin.y + this.height / 2, origin.z + this.depth / 2);
+        Vector3 backLeftBottom = new Vector3(origin.x - (this.width / 2), origin.y, origin.z - (this.depth / 2));
+        Vector3 backRightBottom = new Vector3(origin.x + (this.width / 2), origin.y, origin.z - (this.depth / 2));
+        Vector3 backLeftTop = new Vector3(origin.x - (this.width / 2), origin.y + this.height, origin.z - (this.depth / 2));
+        Vector3 backRightTop = new Vector3(origin.x + (this.width / 2), origin.y + this.height, origin.z - (this.depth / 2));
+
+        Vector3 frontLeftBottom = new Vector3(origin.x - (this.width / 2), origin.y, origin.z + (this.depth / 2));
+        Vector3 frontRightBottom = new Vector3(origin.x + (this.width / 2), origin.y, origin.z + (this.depth / 2));
+        Vector3 frontLeftTop = new Vector3(origin.x - (this.width / 2), origin.y + this.height, origin.z + (this.depth / 2));
+        Vector3 frontRightTop = new Vector3(origin.x + (this.width / 2), origin.y + this.height, origin.z + (this.depth / 2));
 
         // Back face
         faces[0] = new EFace(backLeftBottom, backRightBottom, backLeftTop, this.color);

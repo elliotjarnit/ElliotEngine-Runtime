@@ -1,12 +1,9 @@
 package dev.elliotjarnit.ElliotEngine.Window;
 import dev.elliotjarnit.ElliotEngine.ElliotEngine;
 import dev.elliotjarnit.ElliotEngine.Utils.Vector2;
-import dev.elliotjarnit.ElliotEngine.Utils.Vector3;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,11 +11,11 @@ import java.util.Map;
 public class InputManager {
     private ElliotEngine engine;
     private KeyboardDispatcher keyDispatcher;
-    private MouseDispatcher mouseDispatcher;
     private Robot robot;
+    private boolean robotPaused = false;
     private boolean mouseTaken = false;
+    private Vector2 mouseStart = new Vector2(0, 0);
     private final Map<Key, Boolean> keyDown = new HashMap<>();
-    private Vector2 mouseMoved = new Vector2(0, 0);
 
     public InputManager(ElliotEngine engine) {
         this.engine = engine;
@@ -37,9 +34,6 @@ public class InputManager {
 
         keyDispatcher = new KeyboardDispatcher();
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(keyDispatcher);
-
-        mouseDispatcher = new MouseDispatcher();
-        this.engine.windowManager.getWindow().addMouseMotionListener(mouseDispatcher);
     }
 
     public boolean isKeyDown(Key key) {
@@ -51,24 +45,44 @@ public class InputManager {
     public Vector2 getMouseDelta() {
         if (!mouseTaken) return new Vector2(0, 0);
         if (!engine.windowManager.getWindow().hasFocus()) return new Vector2(0, 0);
+        if (robotPaused) return new Vector2(0, 0);
 
-        Vector2 mouseDelta = new Vector2(mouseMoved);
-        if (engine.getPlatform() == ElliotEngine.Platform.MAC) {
-            mouseDelta.y += 37;
-        }
-        mouseDelta.x *= -1;
-        mouseDelta.y *= -1;
-        this.mouseDispatcher.moveMouseToMiddle();
+        Point mousePos = MouseInfo.getPointerInfo().getLocation();
+        Vector2 center = this.engine.windowManager.getWindowCenterPosition();
+        Vector2 mouseDelta = new Vector2(center.x - mousePos.x, center.y - mousePos.y);
+        this.moveMouseToMiddle();
+
+        if (mouseDelta.x > 150 || mouseDelta.x < -150) mouseDelta.x = 0;
+        if (mouseDelta.y > 150 || mouseDelta.y < -150) mouseDelta.y = 0;
+
         return mouseDelta;
     }
 
     public void takeoverMouse() {
-        this.engine.windowManager.getWindow().setCursor(this.engine.windowManager.getWindow().getToolkit().createCustomCursor(
-                new BufferedImage(3, 3, BufferedImage.TYPE_INT_ARGB), new Point(0, 0), "null"));
-
+        this.hideMouse();
         this.engine.windowManager.getWindow().setFocusTraversalKeysEnabled(false);
+        this.moveMouseToMiddle();
 
         mouseTaken = true;
+    }
+
+    private void hideMouse() {
+        this.engine.windowManager.getWindow().setCursor(this.engine.windowManager.getWindow().getToolkit().createCustomCursor(
+                new BufferedImage(3, 3, BufferedImage.TYPE_INT_ARGB), new Point(0, 0), "null"));
+    }
+
+    private void showMouse() {
+        this.engine.windowManager.getWindow().setCursor(Cursor.getDefaultCursor());
+    }
+
+    private void moveMouseToMiddle() {
+        if (!mouseTaken) return;
+        if (!engine.windowManager.getWindow().hasFocus()) return;
+        if (robotPaused) return;
+        Vector2 mousePos = this.engine.windowManager.getWindowCenterPosition();
+        this.robot.mouseMove((int) mousePos.x, (int) mousePos.y);
+        Point mousePos2 = MouseInfo.getPointerInfo().getLocation();
+        this.mouseStart = new Vector2(mousePos2.x, mousePos2.y);
     }
 
     private class KeyboardDispatcher implements KeyEventDispatcher {
@@ -78,6 +92,11 @@ public class InputManager {
             if (key != null) {
                 if (e.getID() == KeyEvent.KEY_PRESSED) {
                     keyDown.put(key, true);
+                    if (key == Key.ESCAPE) {
+                        if (mouseTaken) robotPaused = !robotPaused;
+                        if (robotPaused) showMouse();
+                        else hideMouse();
+                    }
                 } else if (e.getID() == KeyEvent.KEY_RELEASED) {
                     keyDown.put(key, false);
                 }
@@ -85,32 +104,6 @@ public class InputManager {
             }
             return false;
         }
-    }
-
-    private class MouseDispatcher implements MouseMotionListener {
-
-        @Override
-        public void mouseMoved(MouseEvent e) {
-            if (mouseTaken) {
-                // Get distance from middle of window
-                Vector2 windowCenter = engine.windowManager.getWindowCenterPosition();
-                mouseMoved = new Vector2(e.getX() - windowCenter.x, e.getY() - windowCenter.y);
-            }
-        }
-        @Override
-        public void mouseDragged(MouseEvent e) {
-        }
-
-        public void moveMouseToMiddle() {
-            // Check if window focused
-            if (engine.windowManager.getWindow().hasFocus()) {
-                Vector2 windowCenter = engine.windowManager.getWindowCenterPosition();
-                robot.mouseMove((int) windowCenter.x, (int) windowCenter.y);
-                mouseMoved = new Vector2(0, 0);
-            }
-        }
-
-
     }
 
     public enum Key {

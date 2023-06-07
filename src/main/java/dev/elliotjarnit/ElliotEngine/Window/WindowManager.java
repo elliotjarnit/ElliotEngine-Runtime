@@ -52,12 +52,12 @@ public class WindowManager {
     }
 
     public Vector2 getWindowPosition() {
-        return new Vector2(window.getX(), window.getY());
+        return new Vector2(window.getLocationOnScreen().x, window.getLocationOnScreen().y);
     }
 
     public Vector2 getWindowCenterPosition() {
-        Insets insets = window.getInsets();
-        return new Vector2(window.getX() + (window.getWidth() - (insets.left + insets.right)) / 2, window.getY() + (window.getHeight() - (insets.top + insets.bottom)) / 2);
+        Point location = window.getLocationOnScreen();
+        return new Vector2(location.x + ((double) window.getWidth() / 2), location.y + ((double) window.getHeight() / 2));
     }
 
     public JFrame getWindow() {

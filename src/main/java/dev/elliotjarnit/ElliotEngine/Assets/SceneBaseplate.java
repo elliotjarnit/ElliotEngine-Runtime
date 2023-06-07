@@ -7,6 +7,6 @@ import dev.elliotjarnit.ElliotEngine.Graphics.Color;
 
 public class SceneBaseplate extends ECube {
     public SceneBaseplate() {
-        super(new Vector3(0, -10, 0), 1000, 1000, 1000, new Color(0, 0, 0));
+        super(new Vector3(0, -1, 0), 100, 1, 100, Color.WHITE);
     }
 }

@@ -127,7 +127,7 @@ public class ECamera extends EEntity {
                 1, 0, 0, 0,
                 0, 1, 0, 0,
                 0, 0, 1, 0,
-                position.x, position.y, position.z, 1
+                position.x, -position.y, position.z, 1
         });
     }
 

@@ -11,8 +11,6 @@ public abstract class ElliotEngine {
     private boolean isSetup = false;
     private boolean running = false;
     private EScene currentScene;
-    private final HashMap<Options, String> options = new HashMap<>();
-    private final HashMap<AdvancedOptions, String> advancedOptions = new HashMap<>();
     public WindowManager windowManager;
     public InputManager inputManager;
     public RenderingEngine renderer;
@@ -59,6 +57,8 @@ public abstract class ElliotEngine {
         double skipTicks = 1000000000.0 / 24.0;
 
         while (running) {
+            if (currentScene != null) renderer.renderScene(currentScene);
+
             currentTime = System.nanoTime();
 
             while (currentTime > nextUpdate) {
@@ -66,8 +66,6 @@ public abstract class ElliotEngine {
                 loop();
                 nextUpdate += skipTicks;
             }
-
-            if (currentScene != null) renderer.renderScene(currentScene);
         }
     }
 
@@ -146,4 +144,20 @@ public abstract class ElliotEngine {
     public enum AdvancedOptions {
         MAX_CLIPPING_VERTEXES,
     }
+
+    private final HashMap<Options, String> options = new HashMap<Options, String>() {{
+        // Default options
+        put(Options.NAME, "Game");
+        put(Options.VERSION, "None");
+        put(Options.AUTHOR, "None");
+        put(Options.DESCRIPTION, "None");
+        put(Options.LICENSE, "None");
+        put(Options.WINDOW_WIDTH, "800");
+        put(Options.WINDOW_HEIGHT, "600");
+        put(Options.WINDOW_FULLSCREEN, "false");
+    }};
+    private final HashMap<AdvancedOptions, String> advancedOptions = new HashMap<AdvancedOptions, String>() {{
+        // Default advanced options
+        put(AdvancedOptions.MAX_CLIPPING_VERTEXES, "20");
+    }};
 }

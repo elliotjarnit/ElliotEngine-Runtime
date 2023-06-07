@@ -159,7 +159,7 @@ public abstract class EObject {
                 1.0, 0.0, 0.0, 0.0,
                 0.0, 1.0, 0.0, 0.0,
                 0.0, 0.0, 1.0, 0.0,
-                origin.x, origin.y, origin.z, 1.0
+                origin.x, -origin.y, origin.z, 1.0
         });
     }
 
