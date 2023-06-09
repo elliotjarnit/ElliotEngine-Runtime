@@ -80,14 +80,14 @@ public class RenderingEngine extends JPanel {
                     // Clip space
                     point4 = perspectiveProjectionMatrix.transform(point4);
 
-                    double z = point4.z;
-
                     // Screen space
                     if (point4.w != 0) {
                         point.x /= point4.w;
                         point.y /= point4.w;
                         point.z /= point4.w;
                     }
+
+                    double z = point4.w;
 
                     // Raster space
                     point.x = (point.x + 1.0) * 0.5 * getWidth();
@@ -115,7 +115,7 @@ public class RenderingEngine extends JPanel {
                             if (V1 && V2 && V3) {
                                 double depth = pointsToRender.get(0).z + pointsToRender.get(1).z + pointsToRender.get(2).z;
                                 int zIndex = y * img.getWidth() + x;
-                                if (zBuffer[zIndex] < depth) {
+                                if (depth > zBuffer[zIndex]) {
                                     img.setRGB(x, y, face.getColor().toAwtColor().getRGB());
                                     zBuffer[zIndex] = depth;
                                 }
