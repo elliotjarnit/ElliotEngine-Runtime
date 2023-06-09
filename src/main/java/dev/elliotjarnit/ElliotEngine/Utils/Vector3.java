@@ -51,6 +51,11 @@ public class Vector3 {
         );
     }
 
+    public Vector3 normalize() {
+        double length = Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
+        return new Vector3(this.x / length, this.y / length, this.z / length);
+    }
+
     public String toString() {
         return "(" + this.x + ", " + this.y + ", " + this.z + ")";
     }
