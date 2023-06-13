@@ -10,16 +10,17 @@ import dev.elliotjarnit.ElliotEngine.Utils.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 
 public class RenderingEngine extends JPanel {
     private EScene scene;
     private final ElliotEngine engine;
+    private BufferedImage img;
+    private final HashMap<String, Vector3> screenToWorldSpace = new HashMap<>();
+    private final HashMap<String, EObject> screenToObject = new HashMap<>();
+    private boolean currentlyRendering = false;
     private final boolean meshMap = false;
     private final int MAX_POINTS;
-    private final Vector3 lookAt = new Vector3(0, 0, 0);
-    private EObject lookAtObject = null;
 
     public RenderingEngine(ElliotEngine engine) {
         super();
@@ -29,6 +30,8 @@ public class RenderingEngine extends JPanel {
 
     @Override
     public void paintComponent(Graphics g) {
+        this.currentlyRendering = true;
+
         Graphics2D g2d = (Graphics2D) g;
         g2d.setColor(scene.getSkyColor().toAwtColor());
         g2d.fillRect(0, 0, this.getWidth(), this.getHeight());
@@ -40,7 +43,7 @@ public class RenderingEngine extends JPanel {
             return;
         }
 
-        BufferedImage img = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
+        img = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
         double[] zBuffer = new double[img.getWidth() * img.getHeight()];
         Arrays.fill(zBuffer, Double.NEGATIVE_INFINITY);
 
@@ -122,17 +125,7 @@ public class RenderingEngine extends JPanel {
                                     img.setRGB(x, y, face.getColor().toAwtColor().getRGB());
                                     zBuffer[zIndex] = depth;
 
-                                    // Check if looking at
-                                    if (x == getWidth() / 2 && y == getHeight() / 2) {
-                                        lookAt.x = pointsToRender.get(0).worldPoint.x + pointsToRender.get(1).worldPoint.x + pointsToRender.get(2).worldPoint.x;
-                                        lookAt.y = pointsToRender.get(0).worldPoint.y + pointsToRender.get(1).worldPoint.y + pointsToRender.get(2).worldPoint.y;
-                                        lookAt.z = pointsToRender.get(0).worldPoint.z + pointsToRender.get(1).worldPoint.z + pointsToRender.get(2).worldPoint.z;
-                                        lookAt.x /= 3;
-                                        lookAt.y /= 3;
-                                        lookAt.z /= 3;
-
-                                        lookAtObject = object;
-                                    }
+                                    screenToObject.put(x + "," + y, object);
                                 }
                             }
                         }
@@ -150,6 +143,7 @@ public class RenderingEngine extends JPanel {
             }
         }
         g2d.drawImage(img, 0, 0, null);
+        this.currentlyRendering = false;
     }
 
     public void renderScene(EScene scene) {
@@ -161,12 +155,16 @@ public class RenderingEngine extends JPanel {
         drawCenteredString(g, text, rect, g.getFont());
     }
 
-    public Vector3 getLookingAt() {
-        return lookAt;
+    public EObject getLookingAtObject() {
+        int x = (int) (this.getWidth() / 2);
+        int y = (int) (this.getHeight() / 2);
+        return screenToObject.get(x + "," + y);
     }
 
-    public EObject getLookingAtObject() {
-        return lookAtObject;
+    public EObject getLookingAtObject(Vector2 point) {
+        int x = (int) (point.x);
+        int y = (int) (point.y);
+        return screenToObject.get(x + "," + y);
     }
 
     public void drawCenteredString(Graphics g, String text, Rectangle rect, Font font) {
