@@ -12,15 +12,23 @@ public class EScene {
     private Color skyColor = Color.BLACK;
 
     public EScene() {
-        setup();
+        setup(true);
     }
 
-    public void setup() {
+    public EScene(boolean withBaseplate) {
+        setup(withBaseplate);
+    }
+
+    public void setup(boolean withBaseplate) {
         if (!isSetup) {
             // Setup objects
-            objects = new ArrayList<>();
-            EObject ground = new SceneBaseplate();
-            objects.add(ground);
+            if (withBaseplate) {
+                objects = new ArrayList<>();
+                EObject ground = new SceneBaseplate();
+                objects.add(ground);
+            } else {
+                objects = new ArrayList<>();
+            }
             isSetup = true;
         }
     }

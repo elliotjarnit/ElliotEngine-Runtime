@@ -18,6 +18,8 @@ public class RenderingEngine extends JPanel {
     private final ElliotEngine engine;
     private final boolean meshMap = false;
     private final int MAX_POINTS;
+    private final Vector3 lookAt = new Vector3(0, 0, 0);
+    private EObject lookAtObject = null;
 
     public RenderingEngine(ElliotEngine engine) {
         super();
@@ -35,19 +37,16 @@ public class RenderingEngine extends JPanel {
         if (scene.getCamera() == null) {
             g2d.setColor(Color.WHITE.toAwtColor());
             drawCenteredString(g2d, "No camera in scene", new Rectangle(0, 0, this.getWidth(), this.getHeight()));
-
             return;
         }
 
         BufferedImage img = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
-
-        double aspectRatio = (double) getWidth() / (double) getHeight();
-
-        Matrix4 perspectiveProjectionMatrix = scene.getCamera().getPerspectiveProjectionMatrix(aspectRatio);
-        Matrix4 worldToCameraMatrix = scene.getCamera().getWorldToCameraMatrix();
-
         double[] zBuffer = new double[img.getWidth() * img.getHeight()];
         Arrays.fill(zBuffer, Double.NEGATIVE_INFINITY);
+
+        double aspectRatio = (double) getWidth() / (double) getHeight();
+        Matrix4 perspectiveProjectionMatrix = scene.getCamera().getPerspectiveProjectionMatrix(aspectRatio);
+        Matrix4 worldToCameraMatrix = scene.getCamera().getWorldToCameraMatrix();
 
         // This is the main object loop. Render everything in here.
         // Render all objects
@@ -58,66 +57,82 @@ public class RenderingEngine extends JPanel {
             if (object.getClass() == ECamera.class) continue;
 
             for (EFace face : object.getFaces()) {
-                ArrayList<Vector3> pointsToRender = new ArrayList<>();
+                ArrayList<RenderingPoint> pointsToRender = new ArrayList<>();
 
                 // Loop over all points in face
                 // All transformations are applied here
                 for (int i = 1; i <= 3; i++) {
+                    // Create point
+                    RenderingPoint point = new RenderingPoint();
+
                     // Object space
-                    Vector3 point = new Vector3(face.getVertices()[i - 1]);
-                    point.y *= -1;
+                    Vector3 vert = new Vector3(face.getVertices()[i - 1]);
+                    vert.y *= -1;
 
                     // World Space
-                    point = objectToWorld.transform(point);
+                    point.worldPoint = objectToWorld.transform(vert);
 
                     // Camera space
-                    point = worldToCameraMatrix.transform(point);
+                    Vector3 cameraPoint = worldToCameraMatrix.transform(point.worldPoint);
 
-                    if (point.z < 0) continue;
+                    if (cameraPoint.z < 0) continue;
 
-                    Vector4 point4 = new Vector4(point.x, point.y, point.z, 1.0);
+                    Vector4 perspectivePoint = new Vector4(cameraPoint.x, cameraPoint.y, cameraPoint.z, 1.0);
 
                     // Clip space
-                    point4 = perspectiveProjectionMatrix.transform(point4);
-
-                    double z = point4.z;
+                    perspectivePoint = perspectiveProjectionMatrix.transform(perspectivePoint);
 
                     // Screen space
-                    if (point4.w != 0) {
-                        point.x /= point4.w;
-                        point.y /= point4.w;
-                        point.z /= point4.w;
+                    Vector4 screenPoint = new Vector4(perspectivePoint.x, perspectivePoint.y, perspectivePoint.z, perspectivePoint.w);
+
+                    if (screenPoint.w != 0) {
+                        screenPoint.x /= screenPoint.w;
+                        screenPoint.y /= screenPoint.w;
+                        screenPoint.z /= screenPoint.w;
                     }
 
-                    // Raster space
-                    point.x = (point.x + 1.0) * 0.5 * getWidth();
-                    point.y = (1.0 - point.y) * 0.5 * getHeight();
+                    screenPoint.x = (screenPoint.x + 1.0) * 0.5 * getWidth();
+                    screenPoint.y = (1.0 - screenPoint.y) * 0.5 * getHeight();
+
+                    point.screenPoint = new Vector3(screenPoint.x, screenPoint.y, perspectivePoint.z);
 
                     // Add point to list
-                    pointsToRender.add(new Vector3(point.x, point.y, z));
+                    pointsToRender.add(point);
                 }
 
                 if (!meshMap) {
                     if (pointsToRender.size() != 3) continue;
-                    int minX = (int) Math.max(0, Math.ceil(Math.min(pointsToRender.get(0).x, Math.min(pointsToRender.get(1).x, pointsToRender.get(2).x))));
-                    int maxX = (int) Math.min(img.getWidth() - 1, Math.floor(Math.max(pointsToRender.get(0).x, Math.max(pointsToRender.get(1).x, pointsToRender.get(2).x))));
-                    int minY = (int) Math.max(0, Math.ceil(Math.min(pointsToRender.get(0).y, Math.min(pointsToRender.get(1).y, pointsToRender.get(2).y))));
-                    int maxY = (int) Math.min(img.getHeight() - 1, Math.floor(Math.max(pointsToRender.get(0).y, Math.max(pointsToRender.get(1).y, pointsToRender.get(2).y))));
+                    int minX = (int) Math.max(0, Math.ceil(Math.min(pointsToRender.get(0).screenPoint.x, Math.min(pointsToRender.get(1).screenPoint.x, pointsToRender.get(2).screenPoint.x))));
+                    int maxX = (int) Math.min(img.getWidth() - 1, Math.floor(Math.max(pointsToRender.get(0).screenPoint.x, Math.max(pointsToRender.get(1).screenPoint.x, pointsToRender.get(2).screenPoint.x))));
+                    int minY = (int) Math.max(0, Math.ceil(Math.min(pointsToRender.get(0).screenPoint.y, Math.min(pointsToRender.get(1).screenPoint.y, pointsToRender.get(2).screenPoint.y))));
+                    int maxY = (int) Math.min(img.getHeight() - 1, Math.floor(Math.max(pointsToRender.get(0).screenPoint.y, Math.max(pointsToRender.get(1).screenPoint.y, pointsToRender.get(2).screenPoint.y))));
 
                     for (int y = minY; y <= maxY; y++) {
                         for (int x = minX; x <= maxX; x++) {
                             Vector3 p = new Vector3(x, y, 0);
 
-                            boolean V1 = sameSide(pointsToRender.get(0), pointsToRender.get(1), pointsToRender.get(2), p);
-                            boolean V2 = sameSide(pointsToRender.get(1), pointsToRender.get(2), pointsToRender.get(0), p);
-                            boolean V3 = sameSide(pointsToRender.get(2), pointsToRender.get(0), pointsToRender.get(1), p);
+                            boolean V1 = sameSide(pointsToRender.get(0).screenPoint, pointsToRender.get(1).screenPoint, pointsToRender.get(2).screenPoint, p);
+                            boolean V2 = sameSide(pointsToRender.get(1).screenPoint, pointsToRender.get(2).screenPoint, pointsToRender.get(0).screenPoint, p);
+                            boolean V3 = sameSide(pointsToRender.get(2).screenPoint, pointsToRender.get(0).screenPoint, pointsToRender.get(1).screenPoint, p);
 
                             if (V1 && V2 && V3) {
-                                double depth = pointsToRender.get(0).z + pointsToRender.get(1).z + pointsToRender.get(2).z;
+                                double depth = pointsToRender.get(0).screenPoint.z + pointsToRender.get(1).screenPoint.z + pointsToRender.get(2).screenPoint.z;
                                 int zIndex = y * img.getWidth() + x;
                                 if (zBuffer[zIndex] < depth) {
                                     img.setRGB(x, y, face.getColor().toAwtColor().getRGB());
                                     zBuffer[zIndex] = depth;
+
+                                    // Check if looking at
+                                    if (x == getWidth() / 2 && y == getHeight() / 2) {
+                                        lookAt.x = pointsToRender.get(0).worldPoint.x + pointsToRender.get(1).worldPoint.x + pointsToRender.get(2).worldPoint.x;
+                                        lookAt.y = pointsToRender.get(0).worldPoint.y + pointsToRender.get(1).worldPoint.y + pointsToRender.get(2).worldPoint.y;
+                                        lookAt.z = pointsToRender.get(0).worldPoint.z + pointsToRender.get(1).worldPoint.z + pointsToRender.get(2).worldPoint.z;
+                                        lookAt.x /= 3;
+                                        lookAt.y /= 3;
+                                        lookAt.z /= 3;
+
+                                        lookAtObject = object;
+                                    }
                                 }
                             }
                         }
@@ -126,8 +141,8 @@ public class RenderingEngine extends JPanel {
                     g2d.setColor(Color.WHITE.toAwtColor());
 
                     for (int i = 0; i < pointsToRender.size(); i++) {
-                        Vector3 point = pointsToRender.get(i);
-                        Vector3 nextPoint = pointsToRender.get((i + 1) % pointsToRender.size());
+                        Vector3 point = pointsToRender.get(i).screenPoint;
+                        Vector3 nextPoint = pointsToRender.get((i + 1) % pointsToRender.size()).screenPoint;
 
                         g2d.drawLine((int) point.x, (int) point.y, (int) nextPoint.x, (int) nextPoint.y);
                     }
@@ -146,6 +161,14 @@ public class RenderingEngine extends JPanel {
         drawCenteredString(g, text, rect, g.getFont());
     }
 
+    public Vector3 getLookingAt() {
+        return lookAt;
+    }
+
+    public EObject getLookingAtObject() {
+        return lookAtObject;
+    }
+
     public void drawCenteredString(Graphics g, String text, Rectangle rect, Font font) {
         FontMetrics metrics = g.getFontMetrics(font);
         int x = rect.x + (rect.width - metrics.stringWidth(text)) / 2;
@@ -156,7 +179,7 @@ public class RenderingEngine extends JPanel {
         g.drawString(text, x, y);
     }
 
-    static boolean sameSide(Vector3 A, Vector3 B, Vector3 C, Vector3 p){
+    public boolean sameSide(Vector3 A, Vector3 B, Vector3 C, Vector3 p){
         Vector3 V1V2 = new Vector3(B.x - A.x,B.y - A.y,B.z - A.z);
         Vector3 V1V3 = new Vector3(C.x - A.x,C.y - A.y,C.z - A.z);
         Vector3 V1P = new Vector3(p.x - A.x,p.y - A.y,p.z - A.z);
@@ -218,19 +241,19 @@ public class RenderingEngine extends JPanel {
         }
     }
 
-    public int xIntersect(int x1, int y1, int x2, int y2,
+    private int xIntersect(int x1, int y1, int x2, int y2,
                           int ix, int iy, int kx, int ky) {
         return ((x1 * y2 - y1 * x2) * (ix - kx) - (x1 - x2) * (ix * ky - iy * kx)) /
                 ((x1 - x2) * (iy - ky) - (y1 - y2) * (ix - kx));
     }
 
-    public int yIntersect(int x1, int y1, int x2, int y2,
+    private int yIntersect(int x1, int y1, int x2, int y2,
                           int ix, int iy, int kx, int ky) {
         return ((x1 * y2 - y1 * x2) * (iy - ky) - (y1 - y2) * (ix * ky - iy * kx)) /
                 ((x1 - x2) * (iy - ky) - (y1 - y2) * (ix - kx));
     }
 
-    public void suthHodgClip(Vector2[] polyPoints, Vector2[] clipperPoints) {
+    private void suthHodgClip(Vector2[] polyPoints, Vector2[] clipperPoints) {
         for (int i = 0; i < clipperPoints.length; i++) {
             int k = (i + 1) % clipperPoints.length;
 
@@ -238,5 +261,10 @@ public class RenderingEngine extends JPanel {
                     (int) clipperPoints[i].y, (int) clipperPoints[k].x,
                     (int) clipperPoints[k].y);
         }
+    }
+
+    public static class RenderingPoint {
+        public Vector3 worldPoint;
+        public Vector3 screenPoint;
     }
 }
