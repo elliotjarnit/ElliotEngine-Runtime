@@ -122,10 +122,6 @@ public class InputManager {
     private class MouseDispatcher implements MouseListener {
         @Override
         public void mouseClicked(MouseEvent e) {
-            for (MouseButton button : MouseButton.values()) {
-                mouseDown.put(button, false);
-            }
-
             if (e.getButton() == MouseEvent.BUTTON1) {
                 mouseDown.put(MouseButton.LEFT, true);
             } else if (e.getButton() == MouseEvent.BUTTON2) {
@@ -136,11 +132,19 @@ public class InputManager {
         }
         @Override
         public void mousePressed(MouseEvent e) {
-
+            if (e.getButton() == MouseEvent.BUTTON1) {
+                mouseDown.put(MouseButton.LEFT, true);
+            } else if (e.getButton() == MouseEvent.BUTTON2) {
+                mouseDown.put(MouseButton.MIDDLE, true);
+            } else if (e.getButton() == MouseEvent.BUTTON3) {
+                mouseDown.put(MouseButton.RIGHT, true);
+            }
         }
         @Override
         public void mouseReleased(MouseEvent e) {
-
+            for (MouseButton button : MouseButton.values()) {
+                mouseDown.put(button, false);
+            }
         }
         @Override
         public void mouseEntered(MouseEvent e) {
