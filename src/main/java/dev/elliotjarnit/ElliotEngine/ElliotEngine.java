@@ -3,6 +3,7 @@ package dev.elliotjarnit.ElliotEngine;
 import dev.elliotjarnit.ElliotEngine.Objects.EObject;
 import dev.elliotjarnit.ElliotEngine.Objects.EScene;
 import dev.elliotjarnit.ElliotEngine.Graphics.RenderingEngine;
+import dev.elliotjarnit.ElliotEngine.Overlay.EOverlay;
 import dev.elliotjarnit.ElliotEngine.Window.InputManager;
 import dev.elliotjarnit.ElliotEngine.Window.WindowManager;
 
@@ -12,6 +13,7 @@ public abstract class ElliotEngine {
     private boolean isSetup = false;
     private boolean running = false;
     private EScene currentScene;
+    private EOverlay currentOverlay;
     public WindowManager windowManager;
     public InputManager inputManager;
     public RenderingEngine renderer;
@@ -86,6 +88,10 @@ public abstract class ElliotEngine {
 
     public void setScene(EScene scene) {
         currentScene = scene;
+    }
+
+    public void setOverlay(EOverlay overlay) {
+        currentOverlay = overlay;
     }
 
     public Platform getPlatform() {
