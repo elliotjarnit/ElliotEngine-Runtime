@@ -156,12 +156,17 @@ public class RenderingEngine extends JPanel {
     }
 
     public EObject getLookingAtObject() {
-        int x = (int) (this.getWidth() / 2);
-        int y = (int) (this.getHeight() / 2);
-        return screenToObject.get(x + "," + y);
+        return getLookingAtObject(new Vector2(getWidth() / 2, getHeight() / 2));
     }
 
     public EObject getLookingAtObject(Vector2 point) {
+        while (!currentlyRendering) {
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
         int x = (int) (point.x);
         int y = (int) (point.y);
         return screenToObject.get(x + "," + y);
