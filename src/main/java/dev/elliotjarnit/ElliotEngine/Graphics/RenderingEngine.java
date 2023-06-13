@@ -5,6 +5,8 @@ import dev.elliotjarnit.ElliotEngine.Objects.ECamera;
 import dev.elliotjarnit.ElliotEngine.Objects.EFace;
 import dev.elliotjarnit.ElliotEngine.Objects.EObject;
 import dev.elliotjarnit.ElliotEngine.Objects.EScene;
+import dev.elliotjarnit.ElliotEngine.Overlay.EOComponent;
+import dev.elliotjarnit.ElliotEngine.Overlay.EOverlay;
 import dev.elliotjarnit.ElliotEngine.Utils.*;
 
 import javax.swing.*;
@@ -14,6 +16,7 @@ import java.util.*;
 
 public class RenderingEngine extends JPanel {
     private EScene scene;
+    private EOverlay overlay;
     private final ElliotEngine engine;
     private BufferedImage img;
     private final HashMap<String, Vector3> screenToWorldSpace = new HashMap<>();
@@ -32,6 +35,15 @@ public class RenderingEngine extends JPanel {
         this.currentlyRendering = true;
 
         Graphics2D g2d = (Graphics2D) g;
+
+        // Overlay rendering
+        if (overlay != null) {
+            for (EOComponent component : overlay.getComponents()) {
+                component.render(g2d);
+            }
+        }
+
+        // 3D rendering
         g2d.setColor(scene.getSkyColor().toAwtColor());
         g2d.fillRect(0, 0, this.getWidth(), this.getHeight());
 
@@ -146,6 +158,11 @@ public class RenderingEngine extends JPanel {
 
     public void renderScene(EScene scene) {
         this.scene = scene;
+        this.repaint();
+    }
+
+    public void renderOverlay(EOverlay overlay) {
+        this.overlay = overlay;
         this.repaint();
     }
 

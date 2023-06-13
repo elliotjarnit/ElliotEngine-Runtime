@@ -70,6 +70,10 @@ public abstract class ElliotEngine {
                 renderer.renderScene(currentScene);
             }
 
+            if (currentOverlay != null) {
+                renderer.renderOverlay(currentOverlay);
+            }
+
             currentTime = System.nanoTime();
 
             while (currentTime > nextUpdate) {
