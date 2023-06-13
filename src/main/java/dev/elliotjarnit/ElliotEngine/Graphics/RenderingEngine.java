@@ -19,7 +19,6 @@ public class RenderingEngine extends JPanel {
     private final HashMap<String, Vector3> screenToWorldSpace = new HashMap<>();
     private final HashMap<String, EObject> screenToObject = new HashMap<>();
     private boolean currentlyRendering = false;
-    private final boolean meshMap = false;
     private final int MAX_POINTS;
 
     public RenderingEngine(ElliotEngine engine) {
@@ -52,7 +51,6 @@ public class RenderingEngine extends JPanel {
         Matrix4 worldToCameraMatrix = scene.getCamera().getWorldToCameraMatrix();
 
         // This is the main object loop. Render everything in here.
-        // Render all objects
         for (EObject object : scene.getObjects()) {
             Matrix4 objectToWorld = object.getObjectToWorldMatrix();
 
@@ -103,7 +101,7 @@ public class RenderingEngine extends JPanel {
                     pointsToRender.add(point);
                 }
 
-                if (!meshMap) {
+                if (this.engine.getOption(ElliotEngine.AdvancedOptions.WIRE_FRAME).equals("false")) {
                     if (pointsToRender.size() != 3) continue;
                     int minX = (int) Math.max(0, Math.ceil(Math.min(pointsToRender.get(0).screenPoint.x, Math.min(pointsToRender.get(1).screenPoint.x, pointsToRender.get(2).screenPoint.x))));
                     int maxX = (int) Math.min(img.getWidth() - 1, Math.floor(Math.max(pointsToRender.get(0).screenPoint.x, Math.max(pointsToRender.get(1).screenPoint.x, pointsToRender.get(2).screenPoint.x))));

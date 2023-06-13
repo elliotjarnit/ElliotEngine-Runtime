@@ -143,6 +143,7 @@ public abstract class ElliotEngine {
 
     public enum AdvancedOptions {
         MAX_CLIPPING_VERTEXES,
+        WIRE_FRAME,
     }
 
     private final HashMap<Options, String> options = new HashMap<Options, String>() {{
@@ -159,5 +160,6 @@ public abstract class ElliotEngine {
     private final HashMap<AdvancedOptions, String> advancedOptions = new HashMap<AdvancedOptions, String>() {{
         // Default advanced options
         put(AdvancedOptions.MAX_CLIPPING_VERTEXES, "20");
+        put(AdvancedOptions.WIRE_FRAME, "false");
     }};
 }
