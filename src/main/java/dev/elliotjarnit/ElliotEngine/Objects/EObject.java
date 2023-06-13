@@ -12,8 +12,8 @@ public abstract class EObject {
     private Vector3 origin;
     private Vector2 rotation;
     private EFace[] faces;
-
     private boolean shown = true;
+    public boolean _toRemove = false;
 
 
     public EObject() {
@@ -176,5 +176,13 @@ public abstract class EObject {
 
     public Matrix4 getObjectToWorldMatrix() {
         return this.getRotationMatrix().mul(this.getTranslationMatrix());
+    }
+
+    public void delete() {
+        for (EFace face : this.faces) {
+            face = null;
+        }
+
+        this._toRemove = true;
     }
 }

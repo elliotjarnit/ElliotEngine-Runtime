@@ -1,5 +1,6 @@
 package dev.elliotjarnit.ElliotEngine;
 
+import dev.elliotjarnit.ElliotEngine.Objects.EObject;
 import dev.elliotjarnit.ElliotEngine.Objects.EScene;
 import dev.elliotjarnit.ElliotEngine.Graphics.RenderingEngine;
 import dev.elliotjarnit.ElliotEngine.Window.InputManager;
@@ -57,7 +58,15 @@ public abstract class ElliotEngine {
         double skipTicks = 1000000000.0 / 24.0;
 
         while (running) {
-            if (currentScene != null) renderer.renderScene(currentScene);
+            if (currentScene != null) {
+                for (EObject object : currentScene.getObjects()) {
+                    if (object._toRemove) {
+                        currentScene.removeObject(object);
+                    }
+                }
+
+                renderer.renderScene(currentScene);
+            }
 
             currentTime = System.nanoTime();
 
