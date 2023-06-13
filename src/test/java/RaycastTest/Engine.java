@@ -45,7 +45,6 @@ public class Engine extends ElliotEngine {
 
     @Override
     public void loop() {
-        System.out.println(this.renderer.getLookingAt());
         if (this.inputManager.isKeyDown(InputManager.Key.W)) {
             playerCamera.moveForward(0.5);
         }
