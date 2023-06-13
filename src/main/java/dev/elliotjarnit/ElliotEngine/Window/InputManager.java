@@ -53,7 +53,11 @@ public class InputManager {
 
     public boolean isMouseDown(MouseButton button) {
         synchronized (this) {
-            return mouseDown.get(button);
+            boolean down = mouseDown.get(button);
+            for (MouseButton btn : MouseButton.values()) {
+                mouseDown.put(btn, false);
+            }
+            return down;
         }
     }
 
@@ -129,16 +133,13 @@ public class InputManager {
     private class MouseDispatcher implements MouseListener {
         @Override
         public void mouseClicked(MouseEvent e) {
-            if (e.getButton() == MouseEvent.BUTTON1) {
-                mouseDown.put(MouseButton.LEFT, true);
-            } else if (e.getButton() == MouseEvent.BUTTON2) {
-                mouseDown.put(MouseButton.MIDDLE, true);
-            } else if (e.getButton() == MouseEvent.BUTTON3) {
-                mouseDown.put(MouseButton.RIGHT, true);
-            }
         }
         @Override
         public void mousePressed(MouseEvent e) {
+            for (MouseButton button : MouseButton.values()) {
+                mouseDown.put(button, false);
+            }
+
             if (e.getButton() == MouseEvent.BUTTON1) {
                 mouseDown.put(MouseButton.LEFT, true);
             } else if (e.getButton() == MouseEvent.BUTTON2) {
@@ -155,11 +156,31 @@ public class InputManager {
         }
         @Override
         public void mouseEntered(MouseEvent e) {
+            for (MouseButton button : MouseButton.values()) {
+                mouseDown.put(button, false);
+            }
 
+            if (e.getButton() == MouseEvent.BUTTON1) {
+                mouseDown.put(MouseButton.LEFT, true);
+            } else if (e.getButton() == MouseEvent.BUTTON2) {
+                mouseDown.put(MouseButton.MIDDLE, true);
+            } else if (e.getButton() == MouseEvent.BUTTON3) {
+                mouseDown.put(MouseButton.RIGHT, true);
+            }
         }
         @Override
         public void mouseExited(MouseEvent e) {
+            for (MouseButton button : MouseButton.values()) {
+                mouseDown.put(button, false);
+            }
 
+            if (e.getButton() == MouseEvent.BUTTON1) {
+                mouseDown.put(MouseButton.LEFT, true);
+            } else if (e.getButton() == MouseEvent.BUTTON2) {
+                mouseDown.put(MouseButton.MIDDLE, true);
+            } else if (e.getButton() == MouseEvent.BUTTON3) {
+                mouseDown.put(MouseButton.RIGHT, true);
+            }
         }
     }
 
