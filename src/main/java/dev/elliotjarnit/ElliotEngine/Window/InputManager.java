@@ -4,6 +4,8 @@ import dev.elliotjarnit.ElliotEngine.Utils.Vector2;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,14 +16,17 @@ public class InputManager {
     private Robot robot;
     private boolean robotPaused = false;
     private boolean mouseTaken = false;
-    private Vector2 mouseStart = new Vector2(0, 0);
     private final Map<Key, Boolean> keyDown = new HashMap<>();
+    private final Map<MouseButton, Boolean> mouseDown = new HashMap<>();
 
     public InputManager(ElliotEngine engine) {
         this.engine = engine;
     }
 
     public void setup() {
+        for (MouseButton button : MouseButton.values()) {
+            mouseDown.put(button, false);
+        }
         for (Key key : Key.values()) {
             keyDown.put(key, false);
         }
@@ -39,6 +44,12 @@ public class InputManager {
     public boolean isKeyDown(Key key) {
         synchronized (this) {
             return keyDown.get(key);
+        }
+    }
+
+    public boolean isMouseDown(MouseButton button) {
+        synchronized (this) {
+            return mouseDown.get(button);
         }
     }
 
@@ -81,8 +92,6 @@ public class InputManager {
         if (robotPaused) return;
         Vector2 mousePos = this.engine.windowManager.getWindowCenterPosition();
         this.robot.mouseMove((int) mousePos.x, (int) mousePos.y);
-        Point mousePos2 = MouseInfo.getPointerInfo().getLocation();
-        this.mouseStart = new Vector2(mousePos2.x, mousePos2.y);
     }
 
     private class KeyboardDispatcher implements KeyEventDispatcher {
@@ -104,6 +113,39 @@ public class InputManager {
             }
             return false;
         }
+    }
+
+    private class MouseDispatcher implements MouseListener {
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            if (e.getButton() == MouseEvent.BUTTON1) {
+                mouseDown.put(MouseButton.LEFT, true);
+            } else if (e.getButton() == MouseEvent.BUTTON2) {
+                mouseDown.put(MouseButton.MIDDLE, true);
+            } else if (e.getButton() == MouseEvent.BUTTON3) {
+                mouseDown.put(MouseButton.RIGHT, true);
+            }
+        }
+        @Override
+        public void mousePressed(MouseEvent e) {
+
+        }
+        @Override
+        public void mouseReleased(MouseEvent e) {
+
+        }
+        @Override
+        public void mouseEntered(MouseEvent e) {
+
+        }
+        @Override
+        public void mouseExited(MouseEvent e) {
+
+        }
+    }
+
+    public enum MouseButton {
+        LEFT, RIGHT, MIDDLE;
     }
 
     public enum Key {
