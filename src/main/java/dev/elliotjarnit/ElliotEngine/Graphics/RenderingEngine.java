@@ -160,9 +160,9 @@ public class RenderingEngine extends JPanel {
     }
 
     public EObject getLookingAtObject(Vector2 point) {
-        while (!currentlyRendering) {
+        while (currentlyRendering) {
             try {
-                Thread.sleep(10);
+                Thread.sleep(1);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
