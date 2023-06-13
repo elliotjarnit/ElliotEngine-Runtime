@@ -13,6 +13,7 @@ import java.util.Map;
 public class InputManager {
     private ElliotEngine engine;
     private KeyboardDispatcher keyDispatcher;
+    private MouseDispatcher mouseDispatcher;
     private Robot robot;
     private boolean robotPaused = false;
     private boolean mouseTaken = false;
@@ -39,6 +40,9 @@ public class InputManager {
 
         keyDispatcher = new KeyboardDispatcher();
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(keyDispatcher);
+
+        mouseDispatcher = new MouseDispatcher();
+        this.engine.windowManager.getWindow().addMouseListener(mouseDispatcher);
     }
 
     public boolean isKeyDown(Key key) {
@@ -118,6 +122,10 @@ public class InputManager {
     private class MouseDispatcher implements MouseListener {
         @Override
         public void mouseClicked(MouseEvent e) {
+            for (MouseButton button : MouseButton.values()) {
+                mouseDown.put(button, false);
+            }
+
             if (e.getButton() == MouseEvent.BUTTON1) {
                 mouseDown.put(MouseButton.LEFT, true);
             } else if (e.getButton() == MouseEvent.BUTTON2) {

@@ -61,6 +61,10 @@ public class Engine extends ElliotEngine {
             playerCamera.moveRight(0.5);
         }
 
+        if (this.inputManager.isMouseDown(InputManager.MouseButton.LEFT)) {
+            System.out.println("Left mouse button pressed");
+        }
+
         // Mouse movement
         Vector2 mouseDelta = this.inputManager.getMouseDelta();
 
