@@ -84,8 +84,8 @@ public class EOButton extends EOComponent {
         Vector2 newPosition = new Vector2(this.getPosition().x - ((double) length / 2), this.getPosition().y - ((double) height / 2));
         if (engine.inputManager.isMouseDown(InputManager.MouseButton.LEFT)) {
             Vector2 mousePos = engine.inputManager.getMousePos();
-            if (mousePos.x > this.getPosition().x && mousePos.x < newPosition.x + this.length) {
-                if (mousePos.y > this.getPosition().y && mousePos.y < newPosition.y + this.height) {
+            if (mousePos.x > newPosition.x && mousePos.x < newPosition.x + this.length) {
+                if (mousePos.y > newPosition.y && mousePos.y < newPosition.y + this.height) {
                     for (ClickListener listener : this.listeners) {
                         listener.onClick();
                     }

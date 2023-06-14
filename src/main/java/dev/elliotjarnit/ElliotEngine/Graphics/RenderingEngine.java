@@ -85,11 +85,11 @@ public class RenderingEngine extends JPanel {
 
                     // World Space
                     point.worldPoint = objectToWorld.transform(vert);
-                    System.out.println("World: " + point.worldPoint);
+//                    System.out.println("World: " + point.worldPoint);
 
                     // Camera space
                     Vector3 cameraPoint = worldToCameraMatrix.transform(point.worldPoint);
-                    System.out.println("Camera: " + cameraPoint);
+//                    System.out.println("Camera: " + cameraPoint);
 
                     if (cameraPoint.z < 0) continue;
 
@@ -97,7 +97,7 @@ public class RenderingEngine extends JPanel {
 
                     // Clip space
                     perspectivePoint = perspectiveProjectionMatrix.transform(perspectivePoint);
-                    System.out.println("Clip: " + perspectivePoint);
+//                    System.out.println("Clip: " + perspectivePoint);
 
                     // Screen space
                     Vector4 screenPoint = new Vector4(perspectivePoint.x, perspectivePoint.y, perspectivePoint.z, perspectivePoint.w);
@@ -107,10 +107,11 @@ public class RenderingEngine extends JPanel {
                         screenPoint.y /= screenPoint.w;
                         screenPoint.z /= screenPoint.w;
                     }
-                    System.out.println("Screen: " + screenPoint);
+//                    System.out.println("Screen: " + screenPoint);
 
                     screenPoint.x = (screenPoint.x + 1.0) * 0.5 * getWidth();
                     screenPoint.y = (1.0 - screenPoint.y) * 0.5 * getHeight();
+                    screenPoint.z = (screenPoint.z + 1.0) * 0.5;
 
                     point.screenPoint = new Vector3(screenPoint.x, screenPoint.y, screenPoint.z);
 
@@ -134,11 +135,14 @@ public class RenderingEngine extends JPanel {
                             boolean V3 = sameSide(pointsToRender.get(2).screenPoint, pointsToRender.get(0).screenPoint, pointsToRender.get(1).screenPoint, p);
 
                             if (V1 && V2 && V3) {
-                                double depth = pointsToRender.get(0).screenPoint.z + pointsToRender.get(1).screenPoint.z + pointsToRender.get(2).screenPoint.z;
+                                Vector4 Vert1 = new Vector4(pointsToRender.get(0).screenPoint);
+                                Vector4 Vert2 = new Vector4(pointsToRender.get(1).screenPoint);
+                                Vector4 Vert3 = new Vector4(pointsToRender.get(2).screenPoint);
+                                double depth = interpolateDepth((int) p.x, (int) p.y, Vert1, Vert2, Vert3);
                                 int zIndex = y * img.getWidth() + x;
                                 if (zBuffer[zIndex] < depth) {
-                                    img.setRGB(x, y, face.getColor().toAwtColor().getRGB());
                                     zBuffer[zIndex] = depth;
+                                    img.setRGB(x, y, face.getColor().toAwtColor().getRGB());
 
                                     screenToObject.put(x + "," + y, object);
                                 }
@@ -292,6 +296,26 @@ public class RenderingEngine extends JPanel {
                     (int) clipperPoints[i].y, (int) clipperPoints[k].x,
                     (int) clipperPoints[k].y);
         }
+    }
+
+    private double interpolateDepth(int x, int y, Vector4 vertexA, Vector4 vertexB, Vector4 vertexC) {
+        double areaABC = calculateTriangleArea(vertexA, vertexB, vertexC);
+        double areaPBC = calculateTriangleArea(new Vector4(x, y, 0, 1), vertexB, vertexC);
+        double areaPCA = calculateTriangleArea(vertexA, new Vector4(x, y, 0, 1), vertexC);
+        double areaPAB = calculateTriangleArea(vertexA, vertexB, new Vector4(x, y, 0, 1));
+
+        // Calculate the barycentric coordinates
+        double w1 = areaPBC / areaABC;
+        double w2 = areaPCA / areaABC;
+        double w3 = areaPAB / areaABC;
+
+        // Interpolate the depth values
+        double interpolatedDepth = w1 * vertexA.z + w2 * vertexB.z + w3 * vertexC.z;
+        return interpolatedDepth;
+    }
+
+    private double calculateTriangleArea(Vector4 vertex1, Vector4 vertex2, Vector4 vertex3) {
+        return 0.5f * ((vertex2.x - vertex1.x) * (vertex3.y - vertex1.y) - (vertex3.x - vertex1.x) * (vertex2.y - vertex1.y));
     }
 
     public static class RenderingPoint {
