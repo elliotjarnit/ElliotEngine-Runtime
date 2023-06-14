@@ -76,10 +76,14 @@ public abstract class ElliotEngine {
                 }
 
                 renderer.renderScene(currentScene);
+            } else {
+                renderer.renderScene(null);
             }
 
             if (currentOverlay != null) {
                 renderer.renderOverlay(currentOverlay);
+            } else {
+                renderer.renderOverlay(null);
             }
 
             currentTime = System.nanoTime();
