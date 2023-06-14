@@ -1,5 +1,6 @@
 package dev.elliotjarnit.ElliotEngine.Overlay;
 
+import dev.elliotjarnit.ElliotEngine.ElliotEngine;
 import dev.elliotjarnit.ElliotEngine.Utils.Vector2;
 
 import java.awt.*;
@@ -16,7 +17,7 @@ public abstract class EOComponent {
 
     public abstract void render(Graphics2D g2d);
 
-    public abstract void update();
+    public abstract void update(ElliotEngine engine);
 
     public Vector2 getPosition() {
         return this.position;

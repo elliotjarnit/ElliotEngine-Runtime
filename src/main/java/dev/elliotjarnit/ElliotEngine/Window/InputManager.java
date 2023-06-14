@@ -64,7 +64,7 @@ public class InputManager {
     public Vector2 getMousePos() {
         // Returns mouse position in window coordinates
         Point mousePos = MouseInfo.getPointerInfo().getLocation();
-        Point windowPos = this.engine.windowManager.getWindow().getLocationOnScreen();
+        Point windowPos = this.engine.renderer.getLocationOnScreen();
         return new Vector2(mousePos.x - windowPos.x, mousePos.y - windowPos.y);
     }
 

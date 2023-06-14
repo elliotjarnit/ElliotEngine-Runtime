@@ -30,6 +30,12 @@ public abstract class ElliotEngine {
                 currentScene.getObjects().get(i).update();
             }
         }
+
+        if (currentOverlay != null) {
+            for (int i = 0; i < currentOverlay.getComponents().size(); i++) {
+                currentOverlay.getComponents().get(i).update(this);
+            }
+        }
     }
 
     public void run() {
