@@ -34,6 +34,7 @@ public class EOText extends EOComponent {
 
     @Override
     public void render(Graphics2D g2d) {
+        System.out.println(this.getPosition());
         g2d.setColor(this.EColor.toAwtColor());
         g2d.setFont(new Font("TimesRoman", Font.PLAIN, this.fontSize));
         g2d.drawString(this.text, (int) this.getPosition().x, (int) this.getPosition().y);

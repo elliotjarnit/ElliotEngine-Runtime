@@ -36,18 +36,18 @@ public class RenderingEngine extends JPanel {
 
         Graphics2D g2d = (Graphics2D) g;
 
-        // Overlay rendering
-        if (overlay != null) {
-            for (EOComponent component : overlay.getComponents()) {
-                component.render(g2d);
-            }
+        if (scene == null) {
+            g2d.setColor(EColor.BLACK.toAwtColor());
+            g2d.fillRect(0, 0, this.getWidth(), this.getHeight());
+            g2d.setColor(EColor.WHITE.toAwtColor());
+            drawCenteredString(g2d, "No scene", new Rectangle(0, 0, this.getWidth(), this.getHeight()));
+            return;
         }
 
-        // 3D rendering
         g2d.setColor(scene.getSkyColor().toAwtColor());
         g2d.fillRect(0, 0, this.getWidth(), this.getHeight());
 
-        if (scene == null) return;
+        // 3D rendering
         if (scene.getCamera() == null) {
             g2d.setColor(EColor.WHITE.toAwtColor());
             drawCenteredString(g2d, "No camera in scene", new Rectangle(0, 0, this.getWidth(), this.getHeight()));
@@ -153,6 +153,14 @@ public class RenderingEngine extends JPanel {
             }
         }
         g2d.drawImage(img, 0, 0, null);
+
+        // Overlay rendering
+        if (overlay != null) {
+            for (EOComponent component : overlay.getComponents()) {
+                component.render(g2d);
+            }
+        }
+
         this.currentlyRendering = false;
     }
 

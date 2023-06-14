@@ -5,6 +5,8 @@ import dev.elliotjarnit.ElliotEngine.Objects.ECamera;
 import dev.elliotjarnit.ElliotEngine.Objects.EScene;
 import dev.elliotjarnit.ElliotEngine.Objects.ECube;
 import dev.elliotjarnit.ElliotEngine.Graphics.EColor;
+import dev.elliotjarnit.ElliotEngine.Overlay.EOText;
+import dev.elliotjarnit.ElliotEngine.Overlay.EOverlay;
 import dev.elliotjarnit.ElliotEngine.Utils.Vector2;
 import dev.elliotjarnit.ElliotEngine.Utils.Vector3;
 import dev.elliotjarnit.ElliotEngine.Window.InputManager;
@@ -31,6 +33,12 @@ public class Engine extends ElliotEngine {
     @Override
     public void setup() {
         this.inputManager.takeoverMouse();
+
+        Vector2 windowSize = this.windowManager.getWindowSize();
+
+        EOverlay mainOverlay = new EOverlay();
+        mainOverlay.addComponent(new EOText("Hello world!", new Vector2(windowSize.x / 2, windowSize.y / 2), 10, EColor.WHITE));
+        this.setOverlay(mainOverlay);
 
         EScene mainScene = new EScene(false);
         playerCamera = new ECamera(new Vector3(0, 5, 0), 60.0);
