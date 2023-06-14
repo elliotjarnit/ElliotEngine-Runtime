@@ -17,7 +17,6 @@ public class EOImage extends EOComponent {
     @Override
     public void render(Graphics2D g2d) {
         Image image = Toolkit.getDefaultToolkit().getImage(this.path);
-        System.out.println(image.getHeight(null));
         // Center image on position
         int x = (int) this.getPosition().x - (image.getWidth(null) / 2);
         int y = (int) this.getPosition().y - (image.getHeight(null) / 2);

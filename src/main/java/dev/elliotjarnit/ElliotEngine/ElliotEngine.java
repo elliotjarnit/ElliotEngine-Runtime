@@ -72,7 +72,7 @@ public abstract class ElliotEngine {
 
         EOverlay startupOverlay = new EOverlay();
         EOText elliotEngineText = new EOText(new Vector2((double) this.renderer.getWidth() / 2, 30), "Elliot Engine", 20, EColor.WHITE);
-        EOImage startupImage = new EOImage(new Vector2((double) this.renderer.getWidth() / 2, (double) this.renderer.getHeight() / 2), "src/main/java/dev/elliotjarnit/ElliotEngine/Assets/EELogo.png");
+        EOImage startupImage = new EOImage(new Vector2((double) this.renderer.getWidth() / 2, (double) this.renderer.getHeight() / 2), "resources/EELogo.png");
         EOText loadingText = new EOText(new Vector2((double) this.renderer.getWidth() / 2, (double) this.renderer.getHeight() - 30), "Loading", 20, EColor.WHITE);
         startupOverlay.addComponent(elliotEngineText);
         startupOverlay.addComponent(startupImage);
