@@ -1,8 +1,10 @@
 package dev.elliotjarnit.ElliotEngine.Overlay;
 
+import dev.elliotjarnit.ElliotEngine.Graphics.Color;
 import dev.elliotjarnit.ElliotEngine.Utils.Vector2;
 
-import java.awt.*;
+import java.awt.Graphics2D;
+import java.awt.Font;
 
 public class EOText extends EOComponent {
     private String text;
@@ -32,7 +34,7 @@ public class EOText extends EOComponent {
 
     @Override
     public void render(Graphics2D g2d) {
-        g2d.setColor(this.color);
+        g2d.setColor(this.color.toAwtColor());
         g2d.setFont(new Font("TimesRoman", Font.PLAIN, this.fontSize));
         g2d.drawString(this.text, (int) this.getPosition().x, (int) this.getPosition().y);
     }
