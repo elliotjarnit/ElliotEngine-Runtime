@@ -1,6 +1,6 @@
 package dev.elliotjarnit.ElliotEngine.Objects;
 
-import dev.elliotjarnit.ElliotEngine.Graphics.Color;
+import dev.elliotjarnit.ElliotEngine.Graphics.EColor;
 import dev.elliotjarnit.ElliotEngine.Utils.Vector2;
 import dev.elliotjarnit.ElliotEngine.Utils.Vector3;
 import dev.elliotjarnit.ElliotEngine.Utils.Matrix4;
@@ -133,14 +133,14 @@ public abstract class EObject {
         return this.faces;
     }
 
-    public void setColor(Color color) {
+    public void setColor(EColor EColor) {
         for (EFace face : this.faces) {
-            face.setColor(color);
+            face.setColor(EColor);
         }
     }
 
     public void setColor(int r, int g, int b) {
-        this.setColor(new Color(r, g, b));
+        this.setColor(new EColor(r, g, b));
     }
 
     public Matrix4 getRotationMatrix() {

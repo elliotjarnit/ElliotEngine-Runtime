@@ -1,6 +1,6 @@
 package dev.elliotjarnit.ElliotEngine.Objects;
 
-import dev.elliotjarnit.ElliotEngine.Graphics.Color;
+import dev.elliotjarnit.ElliotEngine.Graphics.EColor;
 import dev.elliotjarnit.ElliotEngine.Utils.Matrix4;
 import dev.elliotjarnit.ElliotEngine.Utils.Vector2;
 import dev.elliotjarnit.ElliotEngine.Utils.Vector3;
@@ -9,43 +9,43 @@ public class EFace {
     private Vector3 v1;
     private Vector3 v2;
     private Vector3 v3;
-    private Color color;
+    private EColor EColor;
 
     public EFace(Vector3 v1, Vector3 v2, Vector3 v3) {
         this.v1 = v1;
         this.v2 = v2;
         this.v3 = v3;
-        this.color = Color.WHITE;
+        this.EColor = EColor.WHITE;
     }
-    public EFace(Vector3 v1, Vector3 v2, Vector3 v3, Color color) {
+    public EFace(Vector3 v1, Vector3 v2, Vector3 v3, EColor EColor) {
         this.v1 = v1;
         this.v2 = v2;
         this.v3 = v3;
-        this.color = color;
+        this.EColor = EColor;
     }
     public EFace(Vector2 v1, Vector2 v2, Vector2 v3) {
         this.v1 = new Vector3(v1.x, v1.y, 0);
         this.v2 = new Vector3(v2.x, v2.y, 0);
         this.v3 = new Vector3(v3.x, v3.y, 0);
-        this.color = Color.WHITE;
+        this.EColor = EColor.WHITE;
     }
-    public EFace(Vector2 v1, Vector2 v2, Vector2 v3, Color color) {
+    public EFace(Vector2 v1, Vector2 v2, Vector2 v3, EColor EColor) {
         this.v1 = new Vector3(v1.x, v1.y, 0);
         this.v2 = new Vector3(v2.x, v2.y, 0);
         this.v3 = new Vector3(v3.x, v3.y, 0);
-        this.color = color;
+        this.EColor = EColor;
     }
     public EFace(Vector3 center, Vector3 v1, Vector3 v2, Vector3 v3) {
         this.v1 = center.add(v1);
         this.v2 = center.add(v2);
         this.v3 = center.add(v3);
-        this.color = Color.WHITE;
+        this.EColor = EColor.WHITE;
     }
-    public EFace(Vector3 center, Vector3 v1, Vector3 v2, Vector3 v3, Color color) {
+    public EFace(Vector3 center, Vector3 v1, Vector3 v2, Vector3 v3, EColor EColor) {
         this.v1 = center.add(v1);
         this.v2 = center.add(v2);
         this.v3 = center.add(v3);
-        this.color = color;
+        this.EColor = EColor;
     }
 
     public void setV1(Vector3 v1) {
@@ -104,12 +104,12 @@ public class EFace {
         return new Vector3(v1_.y * v2_.z - v1_.z * v2_.y, v1_.z * v2_.x - v1_.x * v2_.z, v1_.x * v2_.y - v1_.y * v2_.x).add(center);
     }
 
-    public Color getColor() {
-        return this.color;
+    public EColor getColor() {
+        return this.EColor;
     }
 
-    public void setColor(Color color) {
-        this.color = color;
+    public void setColor(EColor EColor) {
+        this.EColor = EColor;
     }
 
     public Matrix4 getMatrix() {
@@ -122,6 +122,6 @@ public class EFace {
     }
 
     public String toString() {
-        return "EFace[v1=" + this.v1 + ", v2=" + this.v2 + ", v3=" + this.v3 + ", color=" + this.color + "]";
+        return "EFace[v1=" + this.v1 + ", v2=" + this.v2 + ", v3=" + this.v3 + ", EColor=" + this.EColor + "]";
     }
 }

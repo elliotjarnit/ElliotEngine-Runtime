@@ -1,13 +1,13 @@
 package dev.elliotjarnit.ElliotEngine.Objects;
 
-import dev.elliotjarnit.ElliotEngine.Graphics.Color;
+import dev.elliotjarnit.ElliotEngine.Graphics.EColor;
 import dev.elliotjarnit.ElliotEngine.Utils.Vector3;
 
 public class ECube extends EObject {
     private double width;
     private double height;
     private double depth;
-    private Color color;
+    private EColor EColor;
 
 
     public ECube() {
@@ -15,7 +15,7 @@ public class ECube extends EObject {
         this.width = 100;
         this.height = 100;
         this.depth = 100;
-        this.color = Color.WHITE;
+        this.EColor = EColor.WHITE;
 
         this.calculateFaces();
     }
@@ -24,7 +24,7 @@ public class ECube extends EObject {
         this.width = 100;
         this.height = 100;
         this.depth = 100;
-        this.color = Color.WHITE;
+        this.EColor = EColor.WHITE;
 
         this.calculateFaces();
     }
@@ -33,16 +33,16 @@ public class ECube extends EObject {
         this.width = width;
         this.height = height;
         this.depth = depth;
-        this.color = Color.WHITE;
+        this.EColor = EColor.WHITE;
 
         this.calculateFaces();
     }
-    public ECube(Vector3 origin, double width, double height, double depth, Color color) {
+    public ECube(Vector3 origin, double width, double height, double depth, EColor EColor) {
         super(origin);
         this.width = width;
         this.height = height;
         this.depth = depth;
-        this.color = color;
+        this.EColor = EColor;
 
         this.calculateFaces();
     }
@@ -66,28 +66,28 @@ public class ECube extends EObject {
         Vector3 frontRightTop = new Vector3(origin.x + (this.width / 2), origin.y + this.height, origin.z + (this.depth / 2));
 
         // Back face
-        faces[0] = new EFace(backLeftBottom, backRightBottom, backLeftTop, this.color);
-        faces[1] = new EFace(backRightBottom, backRightTop, backLeftTop, this.color);
+        faces[0] = new EFace(backLeftBottom, backRightBottom, backLeftTop, this.EColor);
+        faces[1] = new EFace(backRightBottom, backRightTop, backLeftTop, this.EColor);
 
         // Front face
-        faces[2] = new EFace(frontLeftBottom, frontRightBottom, frontLeftTop, this.color);
-        faces[3] = new EFace(frontRightBottom, frontRightTop, frontLeftTop, this.color);
+        faces[2] = new EFace(frontLeftBottom, frontRightBottom, frontLeftTop, this.EColor);
+        faces[3] = new EFace(frontRightBottom, frontRightTop, frontLeftTop, this.EColor);
 
         // Left face
-        faces[4] = new EFace(backLeftBottom, frontLeftBottom, backLeftTop, this.color);
-        faces[5] = new EFace(frontLeftBottom, frontLeftTop, backLeftTop, this.color);
+        faces[4] = new EFace(backLeftBottom, frontLeftBottom, backLeftTop, this.EColor);
+        faces[5] = new EFace(frontLeftBottom, frontLeftTop, backLeftTop, this.EColor);
 
         // Right face
-        faces[6] = new EFace(backRightBottom, frontRightBottom, backRightTop, this.color);
-        faces[7] = new EFace(frontRightBottom, frontRightTop, backRightTop, this.color);
+        faces[6] = new EFace(backRightBottom, frontRightBottom, backRightTop, this.EColor);
+        faces[7] = new EFace(frontRightBottom, frontRightTop, backRightTop, this.EColor);
 
         // Bottom face
-        faces[8] = new EFace(backLeftBottom, backRightBottom, frontLeftBottom, this.color);
-        faces[9] = new EFace(backRightBottom, frontRightBottom, frontLeftBottom, this.color);
+        faces[8] = new EFace(backLeftBottom, backRightBottom, frontLeftBottom, this.EColor);
+        faces[9] = new EFace(backRightBottom, frontRightBottom, frontLeftBottom, this.EColor);
 
         // Top face
-        faces[10] = new EFace(backLeftTop, backRightTop, frontLeftTop, this.color);
-        faces[11] = new EFace(backRightTop, frontRightTop, frontLeftTop, this.color);
+        faces[10] = new EFace(backLeftTop, backRightTop, frontLeftTop, this.EColor);
+        faces[11] = new EFace(backRightTop, frontRightTop, frontLeftTop, this.EColor);
 
         this.setFaces(faces);
     }
@@ -118,11 +118,11 @@ public class ECube extends EObject {
         this.depth = depth;
         this.calculateFaces();
     }
-    public Color getColor() {
-        return this.color;
+    public EColor getColor() {
+        return this.EColor;
     }
-    public void setColor(Color color) {
-        this.color = color;
+    public void setColor(EColor EColor) {
+        this.EColor = EColor;
         this.calculateFaces();
     }
 }

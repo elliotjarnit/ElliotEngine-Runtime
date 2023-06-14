@@ -49,7 +49,7 @@ public class RenderingEngine extends JPanel {
 
         if (scene == null) return;
         if (scene.getCamera() == null) {
-            g2d.setColor(Color.WHITE.toAwtColor());
+            g2d.setColor(EColor.WHITE.toAwtColor());
             drawCenteredString(g2d, "No camera in scene", new Rectangle(0, 0, this.getWidth(), this.getHeight()));
             return;
         }
@@ -141,7 +141,7 @@ public class RenderingEngine extends JPanel {
                         }
                     }
                 } else {
-                    g2d.setColor(Color.WHITE.toAwtColor());
+                    g2d.setColor(EColor.WHITE.toAwtColor());
 
                     for (int i = 0; i < pointsToRender.size(); i++) {
                         Vector3 point = pointsToRender.get(i).screenPoint;

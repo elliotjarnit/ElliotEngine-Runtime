@@ -3,13 +3,13 @@ package dev.elliotjarnit.ElliotEngine.Objects;
 import java.util.ArrayList;
 
 import dev.elliotjarnit.ElliotEngine.Assets.SceneBaseplate;
-import dev.elliotjarnit.ElliotEngine.Graphics.Color;
+import dev.elliotjarnit.ElliotEngine.Graphics.EColor;
 
 public class EScene {
     private boolean isSetup = false;
     private ArrayList<EObject> objects;
     private ECamera currentCamera;
-    private Color skyColor = Color.BLACK;
+    private EColor skyEColor = EColor.BLACK;
 
     public EScene() {
         setup(true);
@@ -47,11 +47,11 @@ public class EScene {
         return objects.get(index);
     }
 
-    public void setSkyColor(Color color) {
-        skyColor = color;
+    public void setSkyColor(EColor EColor) {
+        skyEColor = EColor;
     }
-    public Color getSkyColor() {
-        return skyColor;
+    public EColor getSkyColor() {
+        return skyEColor;
     }
 
     public void setCamera(ECamera camera) {

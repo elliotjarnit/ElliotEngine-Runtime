@@ -2,11 +2,9 @@ package RaycastTest;
 
 import dev.elliotjarnit.ElliotEngine.ElliotEngine;
 import dev.elliotjarnit.ElliotEngine.Objects.ECamera;
-import dev.elliotjarnit.ElliotEngine.Objects.EFace;
 import dev.elliotjarnit.ElliotEngine.Objects.EScene;
 import dev.elliotjarnit.ElliotEngine.Objects.ECube;
-import dev.elliotjarnit.ElliotEngine.Graphics.Color;
-import dev.elliotjarnit.ElliotEngine.Utils.Matrix4;
+import dev.elliotjarnit.ElliotEngine.Graphics.EColor;
 import dev.elliotjarnit.ElliotEngine.Utils.Vector2;
 import dev.elliotjarnit.ElliotEngine.Utils.Vector3;
 import dev.elliotjarnit.ElliotEngine.Window.InputManager;
@@ -37,7 +35,7 @@ public class Engine extends ElliotEngine {
         EScene mainScene = new EScene(false);
         playerCamera = new ECamera(new Vector3(0, 5, 0), 60.0);
         playerCamera.setRenderDistance(500.0);
-        ECube testCube = new ECube(new Vector3(0, 0, 20), 5, 5, 5, Color.CYAN);
+        ECube testCube = new ECube(new Vector3(0, 0, 20), 5, 5, 5, EColor.CYAN);
         mainScene.addObject(testCube);
         mainScene.setCamera(playerCamera);
         this.setScene(mainScene);

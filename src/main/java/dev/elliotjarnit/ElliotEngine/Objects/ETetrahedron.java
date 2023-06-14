@@ -1,46 +1,46 @@
 package dev.elliotjarnit.ElliotEngine.Objects;
 
-import dev.elliotjarnit.ElliotEngine.Graphics.Color;
+import dev.elliotjarnit.ElliotEngine.Graphics.EColor;
 import dev.elliotjarnit.ElliotEngine.Utils.Vector3;
 
 public class ETetrahedron extends EObject {
     private double width;
     private double height;
-    private Color color;
+    private EColor EColor;
 
     public ETetrahedron() {
         super();
         this.width = 100;
         this.height = 100;
-        this.color = Color.WHITE;
+        this.EColor = EColor.WHITE;
         calculateFaces();
     }
     public ETetrahedron(Vector3 origin) {
         super(origin);
         this.width = 100;
         this.height = 100;
-        this.color = Color.WHITE;
+        this.EColor = EColor.WHITE;
         calculateFaces();
     }
     public ETetrahedron(Vector3 origin, double width, double height) {
         super(origin);
         this.width = width;
         this.height = height;
-        this.color = Color.WHITE;
+        this.EColor = EColor.WHITE;
         calculateFaces();
     }
-    public ETetrahedron(Vector3 origin, double width, double height, Color color) {
+    public ETetrahedron(Vector3 origin, double width, double height, EColor EColor) {
         super(origin);
         this.width = width;
         this.height = height;
-        this.color = color;
+        this.EColor = EColor;
         calculateFaces();
     }
-    public ETetrahedron(Vector3 origin, Color color) {
+    public ETetrahedron(Vector3 origin, EColor EColor) {
         super(origin);
         this.width = 100;
         this.height = 100;
-        this.color = color;
+        this.EColor = EColor;
         calculateFaces();
     }
 
@@ -57,10 +57,10 @@ public class ETetrahedron extends EObject {
         Vector3 frontRight = new Vector3(origin.x + width / 2, origin.y, origin.z + width / 2);
         Vector3 backLeft = new Vector3(origin.x - width / 2, origin.y, origin.z - width / 2);
 
-        faces[0] = new EFace(frontLeft, frontRight, top, color);
-        faces[1] = new EFace(frontRight, backLeft, top, color);
-        faces[2] = new EFace(backLeft, frontLeft, top, color);
-        faces[3] = new EFace(frontLeft, frontRight, backLeft, color);
+        faces[0] = new EFace(frontLeft, frontRight, top, EColor);
+        faces[1] = new EFace(frontRight, backLeft, top, EColor);
+        faces[2] = new EFace(backLeft, frontLeft, top, EColor);
+        faces[3] = new EFace(frontLeft, frontRight, backLeft, EColor);
 
         this.setFaces(faces);
     }
@@ -85,11 +85,11 @@ public class ETetrahedron extends EObject {
         calculateFaces();
     }
 
-    public Color getColor() {
-        return color;
+    public EColor getColor() {
+        return EColor;
     }
-    public void setColor(Color color) {
-        this.color = color;
+    public void setColor(EColor EColor) {
+        this.EColor = EColor;
         calculateFaces();
     }
 }

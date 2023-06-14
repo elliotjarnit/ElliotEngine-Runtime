@@ -1,23 +1,23 @@
 package BasicCubeDraw;
 
+import dev.elliotjarnit.ElliotEngine.Graphics.EColor;
 import dev.elliotjarnit.ElliotEngine.Objects.EFace;
 import dev.elliotjarnit.ElliotEngine.Objects.ETetrahedron;
-import dev.elliotjarnit.ElliotEngine.Graphics.Color;
 import dev.elliotjarnit.ElliotEngine.Utils.Vector2;
 import dev.elliotjarnit.ElliotEngine.Utils.Vector3;
 
 public class SpinningPyramid extends ETetrahedron {
-    public SpinningPyramid(Vector3 origin, double width, double height, Color color) {
-        super(origin, width, height, color);
-        Color[] colors = {
-                Color.RED,
-                Color.GREEN,
-                Color.BLUE,
-                Color.YELLOW
+    public SpinningPyramid(Vector3 origin, double width, double height, EColor EColor) {
+        super(origin, width, height, EColor);
+        EColor[] EColors = {
+                EColor.RED,
+                EColor.GREEN,
+                EColor.BLUE,
+                EColor.YELLOW
         };
         for (int i = 0; i < 4; i++) {
             EFace face = this.getFaces()[i];
-            face.setColor(colors[i]);
+            face.setColor(EColors[i]);
         }
     }
 

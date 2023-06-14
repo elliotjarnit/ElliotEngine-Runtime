@@ -1,11 +1,11 @@
 package BasicCubeDraw;
 
 import dev.elliotjarnit.ElliotEngine.ElliotEngine;
+import dev.elliotjarnit.ElliotEngine.Graphics.EColor;
 import dev.elliotjarnit.ElliotEngine.Objects.ECamera;
 import dev.elliotjarnit.ElliotEngine.Objects.EFace;
 import dev.elliotjarnit.ElliotEngine.Objects.EScene;
 import dev.elliotjarnit.ElliotEngine.Objects.ECube;
-import dev.elliotjarnit.ElliotEngine.Graphics.Color;
 import dev.elliotjarnit.ElliotEngine.Utils.Matrix4;
 import dev.elliotjarnit.ElliotEngine.Utils.Vector2;
 import dev.elliotjarnit.ElliotEngine.Utils.Vector3;
@@ -37,9 +37,9 @@ public class Engine extends ElliotEngine {
         EScene mainScene = new EScene();
         playerCamera = new ECamera(new Vector3(0.1, 2, -10), 60.0);
         playerCamera.setRenderDistance(1000.0);
-        SpinningPyramid myObject = new SpinningPyramid(new Vector3(0, 0, 50), 5, 5, Color.RED);
+        SpinningPyramid myObject = new SpinningPyramid(new Vector3(0, 0, 50), 5, 5, EColor.RED);
         KnightPiece knight1 = new KnightPiece(new Vector3(0, 0, 20));
-        ECube myCube = new ECube(new Vector3(20, 0, 0), 5, 5, 5, Color.CYAN);
+        ECube myCube = new ECube(new Vector3(20, 0, 0), 5, 5, 5, EColor.CYAN);
         System.out.println("Cube");
         for (EFace face : myCube.getFaces()) {
             System.out.println(face);
