@@ -1,9 +1,14 @@
 package dev.elliotjarnit.ElliotEngine;
 
+import dev.elliotjarnit.ElliotEngine.Graphics.EColor;
+import dev.elliotjarnit.ElliotEngine.Objects.ECamera;
 import dev.elliotjarnit.ElliotEngine.Objects.EObject;
 import dev.elliotjarnit.ElliotEngine.Objects.EScene;
 import dev.elliotjarnit.ElliotEngine.Graphics.RenderingEngine;
+import dev.elliotjarnit.ElliotEngine.Overlay.EOImage;
+import dev.elliotjarnit.ElliotEngine.Overlay.EOText;
 import dev.elliotjarnit.ElliotEngine.Overlay.EOverlay;
+import dev.elliotjarnit.ElliotEngine.Utils.Vector2;
 import dev.elliotjarnit.ElliotEngine.Window.InputManager;
 import dev.elliotjarnit.ElliotEngine.Window.WindowManager;
 
@@ -61,29 +66,52 @@ public abstract class ElliotEngine {
         windowManager.start();
         running = true;
 
+        // Create ElliotEngine Overlay
+        EScene startupScene = new EScene(false);
+        startupScene.setCamera(new ECamera());
+
+        EOverlay startupOverlay = new EOverlay();
+        EOText elliotEngineText = new EOText(new Vector2((double) this.renderer.getWidth() / 2, 30), "Elliot Engine", 20, EColor.WHITE);
+        EOImage startupImage = new EOImage(new Vector2((double) this.renderer.getWidth() / 2, (double) this.renderer.getHeight() / 2), "src/main/java/dev/elliotjarnit/ElliotEngine/Assets/EELogo.png");
+        EOText loadingText = new EOText(new Vector2((double) this.renderer.getWidth() / 2, (double) this.renderer.getHeight() - 30), "Loading", 20, EColor.WHITE);
+        startupOverlay.addComponent(elliotEngineText);
+        startupOverlay.addComponent(startupImage);
+        startupOverlay.addComponent(loadingText);
 
         // Updates 24 times per second
         double currentTime = System.nanoTime();
         double nextUpdate = System.nanoTime();
         double skipTicks = 1000000000.0 / 24.0;
 
+        double startTime = System.nanoTime();
+
         while (running) {
-            if (currentScene != null) {
-                for (EObject object : currentScene.getObjects()) {
-                    if (object._toRemove) {
-                        currentScene.removeObject(object);
+            // First 7 seconds of the program
+            if (System.nanoTime() - startTime < 7000000000.0) {
+                double secondsPassed = (System.nanoTime() - startTime) / 1000000000.0;
+
+                loadingText.setText("Loading " + (int) (secondsPassed / 7 * 100) + "%");
+
+                renderer.renderScene(startupScene);
+                renderer.renderOverlay(startupOverlay);
+            } else {
+                if (currentScene != null) {
+                    for (EObject object : currentScene.getObjects()) {
+                        if (object._toRemove) {
+                            currentScene.removeObject(object);
+                        }
                     }
+
+                    renderer.renderScene(currentScene);
+                } else {
+                    renderer.renderScene(null);
                 }
 
-                renderer.renderScene(currentScene);
-            } else {
-                renderer.renderScene(null);
-            }
-
-            if (currentOverlay != null) {
-                renderer.renderOverlay(currentOverlay);
-            } else {
-                renderer.renderOverlay(null);
+                if (currentOverlay != null) {
+                    renderer.renderOverlay(currentOverlay);
+                } else {
+                    renderer.renderOverlay(null);
+                }
             }
 
             currentTime = System.nanoTime();
