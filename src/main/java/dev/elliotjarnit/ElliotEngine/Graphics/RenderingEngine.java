@@ -55,6 +55,7 @@ public class RenderingEngine extends JPanel {
         }
 
         img = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
+
         double[] zBuffer = new double[img.getWidth() * img.getHeight()];
         Arrays.fill(zBuffer, Double.NEGATIVE_INFINITY);
 
