@@ -55,6 +55,7 @@ public class EOButton extends EOComponent {
 
     @Override
     public void render(Graphics2D g2d) {
+
         Font font = new Font("TimesRoman", Font.PLAIN, this.size);
 
         // Get length of text
@@ -65,22 +66,26 @@ public class EOButton extends EOComponent {
         length += this.padding * 2;
         height += this.padding * 2;
 
+        // Position is center of button, convert to bottom left
+        Vector2 newPosition = new Vector2(this.getPosition().x - ((double) length / 2), this.getPosition().y - ((double) height / 2));
+
         // Background
         g2d.setColor(this.color.toAwtColor());
-        g2d.fillRect((int) this.getPosition().x, (int) this.getPosition().y, this.length, this.height);
+        g2d.fillRect((int) newPosition.x, (int) newPosition.y, this.length, this.height);
 
         // Text
         g2d.setColor(this.textColor.toAwtColor());
         g2d.setFont(font);
-        g2d.drawString(this.text, (int) this.getPosition().x + this.padding, (int) this.getPosition().y + this.height - this.padding);
+        g2d.drawString(this.text, (int) newPosition.x + this.padding, (int) newPosition.y + this.height - this.padding);
     }
 
     @Override
     public void update(ElliotEngine engine) {
+        Vector2 newPosition = new Vector2(this.getPosition().x - ((double) length / 2), this.getPosition().y - ((double) height / 2));
         if (engine.inputManager.isMouseDown(InputManager.MouseButton.LEFT)) {
             Vector2 mousePos = engine.inputManager.getMousePos();
-            if (mousePos.x > this.getPosition().x && mousePos.x < this.getPosition().x + this.length) {
-                if (mousePos.y > this.getPosition().y && mousePos.y < this.getPosition().y + this.height) {
+            if (mousePos.x > this.getPosition().x && mousePos.x < newPosition.x + this.length) {
+                if (mousePos.y > this.getPosition().y && mousePos.y < newPosition.y + this.height) {
                     for (ClickListener listener : this.listeners) {
                         listener.onClick();
                     }
