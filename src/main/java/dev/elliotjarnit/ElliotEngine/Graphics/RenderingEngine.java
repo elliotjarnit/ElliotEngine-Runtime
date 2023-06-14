@@ -85,9 +85,11 @@ public class RenderingEngine extends JPanel {
 
                     // World Space
                     point.worldPoint = objectToWorld.transform(vert);
+                    System.out.println("World: " + point.worldPoint);
 
                     // Camera space
                     Vector3 cameraPoint = worldToCameraMatrix.transform(point.worldPoint);
+                    System.out.println("Camera: " + cameraPoint);
 
                     if (cameraPoint.z < 0) continue;
 
@@ -95,6 +97,7 @@ public class RenderingEngine extends JPanel {
 
                     // Clip space
                     perspectivePoint = perspectiveProjectionMatrix.transform(perspectivePoint);
+                    System.out.println("Clip: " + perspectivePoint);
 
                     // Screen space
                     Vector4 screenPoint = new Vector4(perspectivePoint.x, perspectivePoint.y, perspectivePoint.z, perspectivePoint.w);
@@ -104,11 +107,12 @@ public class RenderingEngine extends JPanel {
                         screenPoint.y /= screenPoint.w;
                         screenPoint.z /= screenPoint.w;
                     }
+                    System.out.println("Screen: " + screenPoint);
 
                     screenPoint.x = (screenPoint.x + 1.0) * 0.5 * getWidth();
                     screenPoint.y = (1.0 - screenPoint.y) * 0.5 * getHeight();
 
-                    point.screenPoint = new Vector3(screenPoint.x, screenPoint.y, perspectivePoint.z);
+                    point.screenPoint = new Vector3(screenPoint.x, screenPoint.y, screenPoint.z);
 
                     // Add point to list
                     pointsToRender.add(point);

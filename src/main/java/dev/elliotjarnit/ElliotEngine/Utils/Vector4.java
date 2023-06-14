@@ -46,4 +46,8 @@ public class Vector4 {
     public Vector4 div(double d) {
         return new Vector4(this.x / d, this.y / d, this.z / d, this.w / d);
     }
+
+    public String toString() {
+        return "(" + this.x + ", " + this.y + ", " + this.z + ", " + this.w + ")";
+    }
 }
