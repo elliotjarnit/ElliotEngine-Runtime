@@ -19,6 +19,10 @@ public abstract class EOComponent {
 
     public abstract void update(ElliotEngine engine);
 
+    public void setPosition(Vector2 position) {
+        this.position = position;
+    }
+
     public Vector2 getPosition() {
         return this.position;
     }
