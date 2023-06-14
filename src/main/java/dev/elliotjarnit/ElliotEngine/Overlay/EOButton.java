@@ -60,7 +60,7 @@ public class EOButton extends EOComponent {
 
         // Get length of text
         length = g2d.getFontMetrics(font).stringWidth(this.text);
-        height = g2d.getFontMetrics(font).getHeight();
+        height = this.size;
 
         // Padding
         length += this.padding * 2;

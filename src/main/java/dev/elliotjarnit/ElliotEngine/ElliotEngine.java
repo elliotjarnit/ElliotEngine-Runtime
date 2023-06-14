@@ -32,9 +32,11 @@ public abstract class ElliotEngine {
         }
 
         if (currentOverlay != null) {
-            for (int i = 0; i < currentOverlay.getComponents().size(); i++) {
-                currentOverlay.getComponents().get(i).update(this);
-            }
+            try {
+                for (int i = 0; i < currentOverlay.getComponents().size(); i++) {
+                    currentOverlay.getComponents().get(i).update(this);
+                }
+            } catch (Exception ignored) {}
         }
     }
 
