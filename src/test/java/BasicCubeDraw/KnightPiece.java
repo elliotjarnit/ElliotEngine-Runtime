@@ -1,5 +1,6 @@
 package BasicCubeDraw;
 
+import dev.elliotjarnit.ElliotEngine.Exceptions.NotTriangleException;
 import dev.elliotjarnit.ElliotEngine.Graphics.EColor;
 import dev.elliotjarnit.ElliotEngine.Handlers.FileHandler;
 import dev.elliotjarnit.ElliotEngine.Handlers.ObjHandler;
@@ -38,7 +39,7 @@ public class KnightPiece extends EObject {
             this.setFaces(faces);
         } catch (FileNotFoundException e) {
             System.out.println("File load error");
-        } catch (ObjHandler.NotTriangleException e) {
+        } catch (NotTriangleException e) {
             System.out.println("Contains non triangle faces");
         }
     }
