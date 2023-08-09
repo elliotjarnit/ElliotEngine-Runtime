@@ -114,15 +114,13 @@ public class RenderingEngine extends JPanel {
     }
 
     public Vector3 cameraToScreenSpace(Vector3 cameraSpace, EScene scene) {
-        Vector3 screenSpace = new Vector3(cameraSpace);
-
-        screenSpace = scene.getCamera().getPerspectiveProjectionMatrix((double) getWidth() / (double) getHeight()).transform(screenSpace);
+        Vector3 screenSpace = scene.getCamera().getPerspectiveProjectionMatrix((double) getWidth() / (double) getHeight()).transform(cameraSpace);
 
         screenSpace.x = (screenSpace.x + 1.0) * 0.5 * getWidth();
         screenSpace.y = (1.0 - screenSpace.y) * 0.5 * getHeight();
 
         // Depth used for depth buffer
-        screenSpace.z = (cameraSpace.z + 1.0) * 0.5;
+        screenSpace.z = (screenSpace.z + 1.0) * 0.5;
         return screenSpace;
     }
 
