@@ -92,8 +92,8 @@ public abstract class ElliotEngine {
 
                 loadingText.setText("Loading " + (int) (secondsPassed / 7 * 100) + "%");
 
-                renderer.renderScene(startupScene);
-                renderer.renderOverlay(startupOverlay);
+                renderer.setScene(startupScene);
+                renderer.setOverlay(startupOverlay);
             } else {
                 if (currentScene != null) {
                     for (EObject object : currentScene.getObjects()) {
@@ -102,15 +102,15 @@ public abstract class ElliotEngine {
                         }
                     }
 
-                    renderer.renderScene(currentScene);
+                    renderer.setScene(currentScene);
                 } else {
-                    renderer.renderScene(null);
+                    renderer.setScene(null);
                 }
 
                 if (currentOverlay != null) {
-                    renderer.renderOverlay(currentOverlay);
+                    renderer.setOverlay(currentOverlay);
                 } else {
-                    renderer.renderOverlay(null);
+                    renderer.setOverlay(null);
                 }
             }
 

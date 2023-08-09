@@ -1,5 +1,6 @@
 package dev.elliotjarnit.ElliotEngine.Handlers;
 
+import dev.elliotjarnit.ElliotEngine.Exceptions.NotTriangleException;
 import dev.elliotjarnit.ElliotEngine.Objects.EFace;
 import dev.elliotjarnit.ElliotEngine.Utils.Vector3;
 
@@ -51,11 +52,5 @@ public class BlendHandler {
         }
         // Return faces
         return faces.toArray(new EFace[0]);
-    }
-
-    public static class NotTriangleException extends Exception {
-        public NotTriangleException(String message) {
-            super(message);
-        }
     }
 }
