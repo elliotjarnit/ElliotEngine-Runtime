@@ -1,12 +1,18 @@
+Graphics
 - [] Texture mapping
 - [] Anti-aliasing
-- [] GPU rendering using OpenGL/DirectX/Vulkan
-- [] Raycasting for getting entity in crosshair
-- [] Fully custom UI system
-- [] Performance optimizations
-- [] Networking
-- [] Physics engine
-- [] Sound engine
-- [] Preloaded models
-- [] Procedural generation
 - [] Animations
+
+Gameplay
+- [] Networking (multiplayer)
+- [] Procedural generation
+- [] Raycasting (getting entity/object in crosshair or projectiles)
+- [] Physics engine (collisions, gravity, etc)
+
+Performance
+- [] GPU rendering using OpenGL/DirectX/Vulkan
+- [] Compiled models (not having to process models on every game launch)
+
+Misc
+- [] Fully custom 2D UI system (not piggybacking off AWT's 2D drawing tools)
+- [] Sound engine
