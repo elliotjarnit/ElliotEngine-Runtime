@@ -17,7 +17,7 @@ dependencies {
 
 publishing {
     publications {
-        myLibrary(MavenPublication) {
+        ElliotEngine(MavenPublication) {
             from components.java
         }
     }
