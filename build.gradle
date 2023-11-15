@@ -1,0 +1,29 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+}
+
+group = 'dev.elliotjarnit'
+version = '1.0'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    api 'org.apache.commons:commons-math3:3.6.1'
+    implementation 'com.google.guava:guava:32.1.1-jre'
+}
+
+publishing {
+    repositories {
+        maven {
+            name = 'ElliotEngine'
+            url = "https://maven.pkg.github.com/Swiftzerr/ElliotEngine-Runtime"
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+}
