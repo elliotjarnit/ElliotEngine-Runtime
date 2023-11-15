@@ -87,7 +87,7 @@ public abstract class ElliotEngine {
 
         while (running) {
             // First 7 seconds of the program
-            if (System.nanoTime() - startTime < 7000000000.0) {
+            if (System.nanoTime() - startTime < 7000000000.0 && options.get(Options.LOADING_SCREEN).equals("true")) {
                 double secondsPassed = (System.nanoTime() - startTime) / 1000000000.0;
 
                 loadingText.setText("Loading " + (int) (secondsPassed / 7 * 100) + "%");
@@ -198,6 +198,7 @@ public abstract class ElliotEngine {
         WINDOW_WIDTH,
         WINDOW_HEIGHT,
         WINDOW_FULLSCREEN,
+        LOADING_SCREEN,
     }
 
     public enum AdvancedOptions {
@@ -215,6 +216,7 @@ public abstract class ElliotEngine {
         put(Options.WINDOW_WIDTH, "800");
         put(Options.WINDOW_HEIGHT, "600");
         put(Options.WINDOW_FULLSCREEN, "false");
+        put(Options.LOADING_SCREEN, "true");
     }};
     private final HashMap<AdvancedOptions, String> advancedOptions = new HashMap<AdvancedOptions, String>() {{
         // Default advanced options

@@ -2,10 +2,7 @@ package BasicCubeDraw;
 
 import dev.elliotjarnit.ElliotEngine.ElliotEngine;
 import dev.elliotjarnit.ElliotEngine.Graphics.EColor;
-import dev.elliotjarnit.ElliotEngine.Objects.ECamera;
-import dev.elliotjarnit.ElliotEngine.Objects.EFace;
-import dev.elliotjarnit.ElliotEngine.Objects.EScene;
-import dev.elliotjarnit.ElliotEngine.Objects.ECube;
+import dev.elliotjarnit.ElliotEngine.Objects.*;
 import dev.elliotjarnit.ElliotEngine.Utils.Matrix4;
 import dev.elliotjarnit.ElliotEngine.Utils.Vector2;
 import dev.elliotjarnit.ElliotEngine.Utils.Vector3;
@@ -28,13 +25,14 @@ public class Engine extends ElliotEngine {
         this.setOption(Options.VERSION, "0.0.1");
         this.setOption(Options.WINDOW_WIDTH, "800");
         this.setOption(Options.WINDOW_HEIGHT, "800");
+        this.setOption(Options.LOADING_SCREEN, "false");
     }
 
     @Override
     public void setup() {
         this.inputManager.takeoverMouse();
 
-        EScene mainScene = new EScene();
+        EScene mainScene = new EScene(false);
         playerCamera = new ECamera(new Vector3(0.1, 2, -10), 60.0);
         playerCamera.setRenderDistance(1000.0);
         SpinningPyramid myObject = new SpinningPyramid(new Vector3(0, 0, 50), 5, 5, EColor.RED);
