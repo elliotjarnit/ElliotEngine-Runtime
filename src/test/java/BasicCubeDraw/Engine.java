@@ -25,7 +25,7 @@ public class Engine extends ElliotEngine {
         this.setOption(Options.VERSION, "0.0.1");
         this.setOption(Options.WINDOW_WIDTH, "800");
         this.setOption(Options.WINDOW_HEIGHT, "800");
-        this.setOption(Options.LOADING_SCREEN, "false");
+        this.setOption(Options.LOADING_SCREEN, "true");
     }
 
     @Override

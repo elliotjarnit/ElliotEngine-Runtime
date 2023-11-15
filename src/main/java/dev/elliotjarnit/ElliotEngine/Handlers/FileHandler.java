@@ -1,9 +1,7 @@
 package dev.elliotjarnit.ElliotEngine.Handlers;
 
 import javax.swing.*;
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.*;
 
 public class FileHandler {
     public static String promptFileDialog() {
@@ -37,9 +35,16 @@ public class FileHandler {
         return null;
     }
 
-    public static String[] loadFile(String relativePath) throws FileNotFoundException {
-        String path = System.getProperty("user.dir") + "/" + relativePath;
-        FileReader fileReader = new FileReader(path);
+    public static String[] loadFileFromResources(String fileName) {
+        ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+        InputStream is = classloader.getResourceAsStream(fileName);
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is));
+        String[] lines = bufferedReader.lines().toArray(String[]::new);
+        return lines;
+    }
+
+    public static String[] loadFile(String absolutePath) throws FileNotFoundException {
+        FileReader fileReader = new FileReader(absolutePath);
         BufferedReader bufferedReader = new BufferedReader(fileReader);
         String[] lines = bufferedReader.lines().toArray(String[]::new);
         try {
