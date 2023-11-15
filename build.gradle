@@ -18,7 +18,7 @@ dependencies {
 publishing {
     repositories {
         maven {
-            name = 'ElliotEngine'
+            name = 'GitHubPackages'
             url = "https://maven.pkg.github.com/Swiftzerr/ElliotEngine-Runtime"
             credentials {
                 username = System.getenv("GITHUB_ACTOR")
