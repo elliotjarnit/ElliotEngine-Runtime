@@ -14,6 +14,11 @@ jobs:
       packages: write
     steps:
       - uses: actions/checkout@v4
+      - uses: BrycensRanch/read-properties-action@v1
+        id: all
+        with:
+          file: gradle.properties
+          all: true
       - uses: actions/setup-java@v3
         with:
           java-version: '11'
@@ -23,6 +28,6 @@ jobs:
       - name: Publish package
         uses: gradle/gradle-build-action@749f47bda3e44aa060e82d7b3ef7e40d953bd629
         with:
-          arguments: publish -Pversion=${{ github.sha }}-SNAPSHOT
+          arguments: publish -Pversion=${{ steps.all.outputs.version }}-SNAPSHOT
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
