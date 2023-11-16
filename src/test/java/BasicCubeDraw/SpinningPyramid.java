@@ -1,10 +1,10 @@
 package BasicCubeDraw;
 
-import dev.elliotjarnit.ElliotEngine.Graphics.EColor;
-import dev.elliotjarnit.ElliotEngine.Objects.EFace;
-import dev.elliotjarnit.ElliotEngine.Objects.ETetrahedron;
-import dev.elliotjarnit.ElliotEngine.Utils.Vector2;
-import dev.elliotjarnit.ElliotEngine.Utils.Vector3;
+import dev.elliotjarnit.elliotengine.Graphics.EColor;
+import dev.elliotjarnit.elliotengine.Objects.EFace;
+import dev.elliotjarnit.elliotengine.Objects.ETetrahedron;
+import dev.elliotjarnit.elliotengine.Utils.Vector2;
+import dev.elliotjarnit.elliotengine.Utils.Vector3;
 
 public class SpinningPyramid extends ETetrahedron {
     public SpinningPyramid(Vector3 origin, double width, double height, EColor EColor) {

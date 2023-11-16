@@ -1,12 +1,12 @@
 package BasicCubeDraw;
 
-import dev.elliotjarnit.ElliotEngine.ElliotEngine;
-import dev.elliotjarnit.ElliotEngine.Graphics.EColor;
-import dev.elliotjarnit.ElliotEngine.Objects.*;
-import dev.elliotjarnit.ElliotEngine.Utils.Matrix4;
-import dev.elliotjarnit.ElliotEngine.Utils.Vector2;
-import dev.elliotjarnit.ElliotEngine.Utils.Vector3;
-import dev.elliotjarnit.ElliotEngine.Window.InputManager;
+import dev.elliotjarnit.elliotengine.ElliotEngine;
+import dev.elliotjarnit.elliotengine.Graphics.EColor;
+import dev.elliotjarnit.elliotengine.Objects.*;
+import dev.elliotjarnit.elliotengine.Utils.Matrix4;
+import dev.elliotjarnit.elliotengine.Utils.Vector2;
+import dev.elliotjarnit.elliotengine.Utils.Vector3;
+import dev.elliotjarnit.elliotengine.Window.InputManager;
 
 public class Engine extends ElliotEngine {
     private ECamera playerCamera;

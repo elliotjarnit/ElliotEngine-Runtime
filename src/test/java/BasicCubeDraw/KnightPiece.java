@@ -1,12 +1,12 @@
 package BasicCubeDraw;
 
-import dev.elliotjarnit.ElliotEngine.Exceptions.NotTriangleException;
-import dev.elliotjarnit.ElliotEngine.Graphics.EColor;
-import dev.elliotjarnit.ElliotEngine.Handlers.FileHandler;
-import dev.elliotjarnit.ElliotEngine.Handlers.ObjHandler;
-import dev.elliotjarnit.ElliotEngine.Objects.EFace;
-import dev.elliotjarnit.ElliotEngine.Objects.EObject;
-import dev.elliotjarnit.ElliotEngine.Utils.Vector3;
+import dev.elliotjarnit.elliotengine.Exceptions.NotTriangleException;
+import dev.elliotjarnit.elliotengine.Graphics.EColor;
+import dev.elliotjarnit.elliotengine.Handlers.FileHandler;
+import dev.elliotjarnit.elliotengine.Handlers.ObjHandler;
+import dev.elliotjarnit.elliotengine.Objects.EFace;
+import dev.elliotjarnit.elliotengine.Objects.EObject;
+import dev.elliotjarnit.elliotengine.Utils.Vector3;
 
 import java.io.FileNotFoundException;
 
