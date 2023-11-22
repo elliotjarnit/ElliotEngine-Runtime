@@ -28,6 +28,11 @@ public class WindowManager {
         Container pane = window.getContentPane();
         pane.setLayout(new BorderLayout());
         pane.add(renderingEngine, BorderLayout.CENTER);
+
+        if (this.engine.getPlatform() == ElliotEngine.Platform.MAC) {
+            System.setProperty("apple.laf.useScreenMenuBar", "true");
+            System.setProperty("apple.awt.application.name", this.engine.getOption(ElliotEngine.Options.NAME));
+        }
     }
 
     public void start() {
