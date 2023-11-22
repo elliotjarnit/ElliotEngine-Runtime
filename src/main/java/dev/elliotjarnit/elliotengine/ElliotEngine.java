@@ -49,6 +49,12 @@ public abstract class ElliotEngine {
         if (!isSetup) {
             this.optionSetup();
 
+            // Mac OS X specific options
+            if (this.getPlatform() == ElliotEngine.Platform.MAC) {
+                System.setProperty("apple.laf.useScreenMenuBar", "true");
+                System.setProperty("apple.awt.application.name", this.getOption(ElliotEngine.Options.NAME));
+            }
+
             // Setup renderer
             renderer = new RenderingEngine(this);
             // Setup window
