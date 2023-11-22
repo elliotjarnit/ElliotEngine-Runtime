@@ -17,6 +17,8 @@ public class RenderingEngine extends JPanel {
     private EScene scene;
     private EOverlay overlay;
     private final ElliotEngine engine;
+    private double lastFrameTime = System.nanoTime();
+    private int fps = 0;
 
     public RenderingEngine(ElliotEngine engine) {
         super();
@@ -28,6 +30,11 @@ public class RenderingEngine extends JPanel {
     @Override
     public void paintComponent(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
+
+        // Calculate FPS
+        double currentTime = System.nanoTime();
+        fps = (int) (1 / ((currentTime - lastFrameTime) / 1000000000));
+        lastFrameTime = currentTime;
 
         // Clear screen
         g2d.setColor(scene.getSkyColor().toAwtColor());
@@ -185,7 +192,11 @@ public class RenderingEngine extends JPanel {
         g.drawString(text, x, y);
     }
 
-    public boolean sameSide(Vector3 A, Vector3 B, Vector3 C, Vector3 p){
+    public int getFPS() {
+        return this.fps;
+    }
+
+    private boolean sameSide(Vector3 A, Vector3 B, Vector3 C, Vector3 p){
         Vector3 V1V2 = new Vector3(B.x - A.x,B.y - A.y,B.z - A.z);
         Vector3 V1V3 = new Vector3(C.x - A.x,C.y - A.y,C.z - A.z);
         Vector3 V1P = new Vector3(p.x - A.x,p.y - A.y,p.z - A.z);
