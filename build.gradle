@@ -14,11 +14,14 @@ dependencies {
     implementation 'com.google.guava:guava:32.1.1-jre'
 }
 
+java {
+    withSourcesJar()
+}
+
 publishing {
     publications {
         elliotEngine(MavenPublication) {
             from components.java
-            artifact tasks.sourceJar
         }
     }
 
