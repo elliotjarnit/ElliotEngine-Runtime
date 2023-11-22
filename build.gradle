@@ -18,6 +18,7 @@ publishing {
     publications {
         elliotEngine(MavenPublication) {
             from components.java
+            artifact tasks.sourceJar
         }
     }
 
