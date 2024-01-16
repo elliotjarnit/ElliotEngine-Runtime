@@ -37,13 +37,12 @@ public class RenderingEngine extends JPanel {
         lastFrameTime = currentTime;
 
         // Clear screen
-        g2d.setColor(scene.getSkyColor().toAwtColor());
+        if (scene != null) g2d.setColor(scene.getSkyColor().toAwtColor());
+        else g2d.setColor(EColor.BLACK.toAwtColor());
         g2d.fillRect(0, 0, this.getWidth(), this.getHeight());
 
         // No scene selected visual
         if (scene == null) {
-            g2d.setColor(EColor.BLACK.toAwtColor());
-            g2d.fillRect(0, 0, this.getWidth(), this.getHeight());
             g2d.setColor(EColor.WHITE.toAwtColor());
             drawCenteredString(g2d, "No scene", new Rectangle(0, 0, this.getWidth(), this.getHeight()));
             return;
