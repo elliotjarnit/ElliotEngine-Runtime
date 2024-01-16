@@ -195,6 +195,33 @@ public class RenderingEngine extends JPanel {
         return this.fps;
     }
 
+    public EObject getObjectAtPoint(Vector2 point) {
+        for (EObject object : this.scene.getObjects()) {
+            for (EFace face : object.getFaces()) {
+                Vector3[] facePoints = new Vector3[3];
+                for (int i = 0; i < 3; i++) {
+                    Vector3 objectSpace = face.getVertices()[i];
+                    Vector3 worldSpace = this.objectToWorldSpace(objectSpace, object);
+                    Vector3 cameraSpace = this.worldToCameraSpace(worldSpace, this.scene);
+                    Vector3 screenSpace = this.cameraToScreenSpace(cameraSpace, this.scene);
+                    facePoints[i] = screenSpace;
+                }
+
+                // Don't render face if point is missing
+                if (facePoints[0] == null || facePoints[1] == null || facePoints[2] == null) continue;
+
+                if (this.pointInTriangle(new Vector3(point.x, point.y, 0), facePoints[0], facePoints[1], facePoints[2])) {
+                    return object;
+                }
+            }
+        }
+        return null;
+    }
+
+    private boolean pointInTriangle(Vector3 p, Vector3 A, Vector3 B, Vector3 C){
+        return sameSide(A,B,C,p) && sameSide(B,C,A,p) && sameSide(C,A,B,p);
+    }
+
     private boolean sameSide(Vector3 A, Vector3 B, Vector3 C, Vector3 p){
         Vector3 V1V2 = new Vector3(B.x - A.x,B.y - A.y,B.z - A.z);
         Vector3 V1V3 = new Vector3(C.x - A.x,C.y - A.y,C.z - A.z);

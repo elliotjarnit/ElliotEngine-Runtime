@@ -25,7 +25,7 @@ public class Engine extends ElliotEngine {
         this.setOption(Options.VERSION, "0.0.1");
         this.setOption(Options.WINDOW_WIDTH, "800");
         this.setOption(Options.WINDOW_HEIGHT, "800");
-        this.setOption(Options.LOADING_SCREEN, "true");
+        this.setOption(Options.LOADING_SCREEN, "false");
     }
 
     @Override
@@ -55,9 +55,6 @@ public class Engine extends ElliotEngine {
                 22, 52, 5, 555,
                 33, 33, 555, 5
         });
-
-
-        System.out.println(test.inverse());
     }
 
     @Override
@@ -75,6 +72,13 @@ public class Engine extends ElliotEngine {
 
         if (this.inputManager.isKeyDown(InputManager.Key.D)) {
             playerCamera.moveRight(0.5);
+        }
+
+        if (this.inputManager.isMouseDown(InputManager.MouseButton.LEFT)) {
+            System.out.println("Left mouse button down");
+            Vector2 mousePos = this.inputManager.getMousePos();
+
+            System.out.println(this.renderer.getObjectAtPoint(mousePos));
         }
 
         // Mouse movement
