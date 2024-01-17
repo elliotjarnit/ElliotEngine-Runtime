@@ -12,6 +12,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.*;
+import java.util.List;
 
 public class RenderingEngine extends JPanel {
     private EScene scene;
@@ -19,10 +20,37 @@ public class RenderingEngine extends JPanel {
     private final ElliotEngine engine;
     private double lastFrameTime = System.nanoTime();
     private int fps = 0;
+    public enum ProjectionMode {
+        PERSPECTIVE,
+        ORTHOGRAPHIC
+    }
+    private ProjectionMode projectionMode = ProjectionMode.PERSPECTIVE;
+    public enum RenderMode {
+        WIREFRAME,
+        SOLID,
+        BOTH
+    }
+    private RenderMode renderMode = RenderMode.SOLID;
 
     public RenderingEngine(ElliotEngine engine) {
         super();
         this.engine = engine;
+    }
+
+    public void setProjectionMode(ProjectionMode mode) {
+        this.projectionMode = mode;
+    }
+
+    public ProjectionMode getProjectionMode() {
+        return this.projectionMode;
+    }
+
+    public void setRenderMode(RenderMode mode) {
+        this.renderMode = mode;
+    }
+
+    public RenderMode getRenderMode() {
+        return this.renderMode;
     }
 
     // JPanel built-in paint function
@@ -98,9 +126,12 @@ public class RenderingEngine extends JPanel {
                 // Don't render face if point is missing
                 if (facePoints[0] == null || facePoints[1] == null || facePoints[2] == null) continue;
 
-                if (this.engine.getOption(ElliotEngine.AdvancedOptions.WIRE_FRAME).equals("false")) {
+                if (renderMode == RenderMode.SOLID) {
                     this.renderFaceInWorld(img, zBuffer, facePoints[0], facePoints[1], facePoints[2], face.getColor());
-                } else {
+                } else if (renderMode == RenderMode.WIREFRAME) {
+                    this.renderFaceInWorldWireframe(g2d, facePoints[0], facePoints[1], facePoints[2]);
+                } else if (renderMode == RenderMode.BOTH) {
+                    this.renderFaceInWorld(img, zBuffer, facePoints[0], facePoints[1], facePoints[2], face.getColor());
                     this.renderFaceInWorldWireframe(g2d, facePoints[0], facePoints[1], facePoints[2]);
                 }
             }
@@ -118,7 +149,14 @@ public class RenderingEngine extends JPanel {
     }
 
     public Vector3 cameraToScreenSpace(Vector3 cameraSpace, EScene scene) {
-        Vector3 screenSpace = scene.getCamera().getPerspectiveProjectionMatrix((double) getWidth() / (double) getHeight()).transform(cameraSpace);
+        Vector3 screenSpace;
+        if (projectionMode == ProjectionMode.PERSPECTIVE) {
+            screenSpace = scene.getCamera().getPerspectiveProjectionMatrix((double) getWidth() / (double) getHeight()).transform(cameraSpace);
+        } else if (projectionMode == ProjectionMode.ORTHOGRAPHIC) {
+            screenSpace = scene.getCamera().getOrthographicProjectionMatrix((double) getWidth() / (double) getHeight()).transform(cameraSpace);
+        } else {
+            screenSpace = new Vector3();
+        }
 
         screenSpace.x = (screenSpace.x + 1.0) * 0.5 * getWidth();
         screenSpace.y = (1.0 - screenSpace.y) * 0.5 * getHeight();
@@ -196,26 +234,13 @@ public class RenderingEngine extends JPanel {
     }
 
     public EObject getObjectAtPoint(Vector2 point) {
-        for (EObject object : this.scene.getObjects()) {
-            for (EFace face : object.getFaces()) {
-                Vector3[] facePoints = new Vector3[3];
-                for (int i = 0; i < 3; i++) {
-                    Vector3 objectSpace = face.getVertices()[i];
-                    Vector3 worldSpace = this.objectToWorldSpace(objectSpace, object);
-                    Vector3 cameraSpace = this.worldToCameraSpace(worldSpace, this.scene);
-                    Vector3 screenSpace = this.cameraToScreenSpace(cameraSpace, this.scene);
-                    facePoints[i] = screenSpace;
-                }
-
-                // Don't render face if point is missing
-                if (facePoints[0] == null || facePoints[1] == null || facePoints[2] == null) continue;
-
-                if (this.pointInTriangle(new Vector3(point.x, point.y, 0), facePoints[0], facePoints[1], facePoints[2])) {
-                    return object;
-                }
-            }
-        }
         return null;
+    }
+
+    public EObject getObjectLookingAt() {
+        // Calcuate middle of screen
+        Vector2 middle = new Vector2(this.getWidth() / 2, this.getHeight() / 2);
+        return this.getObjectAtPoint(middle);
     }
 
     private boolean pointInTriangle(Vector3 p, Vector3 A, Vector3 B, Vector3 C){

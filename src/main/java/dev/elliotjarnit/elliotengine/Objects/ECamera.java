@@ -73,12 +73,47 @@ public class ECamera extends EEntity {
         this.addOrigin(change);
     }
 
+    public void moveBackward(double distance) {
+        Matrix4 rotationMatrix = this.getRotationMatrix();
+        Vector3 forwardVector = new Vector3(rotationMatrix.get(0, 2), rotationMatrix.get(1, 2), rotationMatrix.get(2, 2));
+        Vector3 change = forwardVector.mul(-distance);
+        change.y = 0;
+        this.addOrigin(change);
+    }
+
     public void moveRight(double distance) {
         Matrix4 rotationMatrix = this.getRotationMatrix();
         Vector3 forwardVector = new Vector3(rotationMatrix.get(0, 2), rotationMatrix.get(1, 2), rotationMatrix.get(2, 2));
         Vector3 rightVector = forwardVector.cross(new Vector3(0, 1, 0));
         Vector3 change = rightVector.mul(distance);
         change.y = 0;
+        this.addOrigin(change);
+    }
+
+    public void moveLeft(double distance) {
+        Matrix4 rotationMatrix = this.getRotationMatrix();
+        Vector3 forwardVector = new Vector3(rotationMatrix.get(0, 2), rotationMatrix.get(1, 2), rotationMatrix.get(2, 2));
+        Vector3 rightVector = forwardVector.cross(new Vector3(0, 1, 0));
+        Vector3 change = rightVector.mul(-distance);
+        change.y = 0;
+        this.addOrigin(change);
+    }
+
+    public void moveUp(double distance) {
+        Matrix4 rotationMatrix = this.getRotationMatrix();
+        Vector3 upVector = new Vector3(rotationMatrix.get(0, 1), rotationMatrix.get(1, 1), rotationMatrix.get(2, 1));
+        Vector3 change = upVector.mul(distance);
+        change.x = 0;
+        change.z = 0;
+        this.addOrigin(change);
+    }
+
+    public void moveDown(double distance) {
+        Matrix4 rotationMatrix = this.getRotationMatrix();
+        Vector3 upVector = new Vector3(rotationMatrix.get(0, 1), rotationMatrix.get(1, 1), rotationMatrix.get(2, 1));
+        Vector3 change = upVector.mul(-distance);
+        change.x = 0;
+        change.z = 0;
         this.addOrigin(change);
     }
 
@@ -96,6 +131,23 @@ public class ECamera extends EEntity {
                 0, 2 * near / (t - b), 0,  0,
                 (r + l) / (r - l), (t + b) / (t - b), -(far + near) / (far / near), -1,
                 0, 0, -2 * far * near / (far - near), 0
+        });
+    }
+
+    public Matrix4 getOrthographicProjectionMatrix(double aspectRatio) {
+        double far = this.getRenderDistance();
+        double near = this.getNearDistance();
+
+        double t = Math.tan(this.fov * 0.5 * Math.PI / 180) * near;
+        double r = aspectRatio * t;
+        double l = -r;
+        double b = -t;
+
+        return new Matrix4(new double[] {
+                2 / (r - l), 0, 0, -(r + l) / (r - l),
+                0, 2 / (t - b), 0, -(t + b) / (t - b),
+                0, 0, -2 / (far - near), -(far + near) / (far - near),
+                0, 0, 0, 1
         });
     }
 

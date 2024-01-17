@@ -2,6 +2,7 @@ package BasicCubeDraw;
 
 import dev.elliotjarnit.elliotengine.ElliotEngine;
 import dev.elliotjarnit.elliotengine.Graphics.EColor;
+import dev.elliotjarnit.elliotengine.Graphics.RenderingEngine;
 import dev.elliotjarnit.elliotengine.Objects.*;
 import dev.elliotjarnit.elliotengine.Utils.Matrix4;
 import dev.elliotjarnit.elliotengine.Utils.Vector2;
@@ -31,6 +32,7 @@ public class Engine extends ElliotEngine {
     @Override
     public void setup() {
         this.inputManager.takeoverMouse();
+        this.renderer.setProjectionMode(RenderingEngine.ProjectionMode.PERSPECTIVE);
 
         EScene mainScene = new EScene(false);
         playerCamera = new ECamera(new Vector3(0.1, 2, -10), 60.0);
@@ -64,15 +66,45 @@ public class Engine extends ElliotEngine {
         }
 
         if (this.inputManager.isKeyDown(InputManager.Key.S)) {
-            playerCamera.moveForward(-0.5);
+            playerCamera.moveBackward(0.5);
         }
         if (this.inputManager.isKeyDown(InputManager.Key.A)) {
-            playerCamera.moveRight(-0.5);
+            playerCamera.moveLeft(0.5);
         }
 
         if (this.inputManager.isKeyDown(InputManager.Key.D)) {
             playerCamera.moveRight(0.5);
         }
+
+        if (this.inputManager.isKeyDown(InputManager.Key.SPACE)) {
+            playerCamera.moveUp(0.5);
+        }
+
+        if (this.inputManager.isKeyDown(InputManager.Key.SHIFT)) {
+            playerCamera.moveDown(0.5);
+        }
+
+        if (this.inputManager.isKeyDown(InputManager.Key.R)) {
+            if (this.renderer.getProjectionMode() == RenderingEngine.ProjectionMode.PERSPECTIVE) {
+                this.renderer.setProjectionMode(RenderingEngine.ProjectionMode.ORTHOGRAPHIC);
+            } else {
+                this.renderer.setProjectionMode(RenderingEngine.ProjectionMode.PERSPECTIVE);
+            }
+        }
+
+        if (this.inputManager.isKeyDown(InputManager.Key.T)) {
+            if (this.renderer.getRenderMode() == RenderingEngine.RenderMode.WIREFRAME) {
+                this.renderer.setRenderMode(RenderingEngine.RenderMode.SOLID);
+            } else {
+                this.renderer.setRenderMode(RenderingEngine.RenderMode.WIREFRAME);
+            }
+        }
+
+        if (this.inputManager.isKeyDown(InputManager.Key.ESCAPE)) {
+            this.stop();
+        }
+
+
 
         if (this.inputManager.isMouseDown(InputManager.MouseButton.LEFT)) {
             System.out.println("Left mouse button down");
