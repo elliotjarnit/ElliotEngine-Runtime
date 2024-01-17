@@ -61,26 +61,26 @@ public class Engine extends ElliotEngine {
 
     @Override
     public void loop() {
-        if (this.inputManager.isKeyDown(InputManager.Key.W)) {
+        if (this.inputManager.isKeyPressed(InputManager.Key.W)) {
             playerCamera.moveForward(0.5);
         }
 
-        if (this.inputManager.isKeyDown(InputManager.Key.S)) {
+        if (this.inputManager.isKeyPressed(InputManager.Key.S)) {
             playerCamera.moveBackward(0.5);
         }
-        if (this.inputManager.isKeyDown(InputManager.Key.A)) {
+        if (this.inputManager.isKeyPressed(InputManager.Key.A)) {
             playerCamera.moveLeft(0.5);
         }
 
-        if (this.inputManager.isKeyDown(InputManager.Key.D)) {
+        if (this.inputManager.isKeyPressed(InputManager.Key.D)) {
             playerCamera.moveRight(0.5);
         }
 
-        if (this.inputManager.isKeyDown(InputManager.Key.SPACE)) {
+        if (this.inputManager.isKeyPressed(InputManager.Key.SPACE)) {
             playerCamera.moveUp(0.5);
         }
 
-        if (this.inputManager.isKeyDown(InputManager.Key.SHIFT)) {
+        if (this.inputManager.isKeyPressed(InputManager.Key.SHIFT)) {
             playerCamera.moveDown(0.5);
         }
 
@@ -95,7 +95,7 @@ public class Engine extends ElliotEngine {
         if (this.inputManager.isKeyDown(InputManager.Key.T)) {
             if (this.renderer.getRenderMode() == RenderingEngine.RenderMode.WIREFRAME) {
                 this.renderer.setRenderMode(RenderingEngine.RenderMode.SOLID);
-            } else {
+            } else if (this.renderer.getRenderMode() == RenderingEngine.RenderMode.SOLID) {
                 this.renderer.setRenderMode(RenderingEngine.RenderMode.WIREFRAME);
             }
         }

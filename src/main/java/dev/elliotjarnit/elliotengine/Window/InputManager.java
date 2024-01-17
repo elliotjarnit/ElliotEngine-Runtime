@@ -18,6 +18,8 @@ public class InputManager {
     private boolean robotPaused = false;
     private boolean mouseTaken = false;
     private final Map<Key, Boolean> keyDown = new HashMap<>();
+    private final Map<Key, Boolean> keyUp = new HashMap<>();
+    private final Map<Key, Boolean> keyPressed = new HashMap<>();
     private final Map<MouseButton, Boolean> mouseDown = new HashMap<>();
 
     public InputManager(ElliotEngine engine) {
@@ -30,6 +32,12 @@ public class InputManager {
         }
         for (Key key : Key.values()) {
             keyDown.put(key, false);
+        }
+        for (Key key : Key.values()) {
+            keyUp.put(key, false);
+        }
+        for (Key key : Key.values()) {
+            keyPressed.put(key, false);
         }
 
         try {
@@ -45,9 +53,25 @@ public class InputManager {
         this.engine.windowManager.getWindow().addMouseListener(mouseDispatcher);
     }
 
+    public boolean isKeyPressed(Key key) {
+        synchronized (this) {
+            return keyPressed.get(key);
+        }
+    }
+
     public boolean isKeyDown(Key key) {
         synchronized (this) {
-            return keyDown.get(key);
+            boolean down = keyDown.get(key);
+            keyDown.put(key, false);
+            return down;
+        }
+    }
+
+    public boolean isKeyUp(Key key) {
+        synchronized (this) {
+            boolean up = keyUp.get(key);
+            keyUp.put(key, false);
+            return up;
         }
     }
 
@@ -113,8 +137,10 @@ public class InputManager {
         @Override
         public boolean dispatchKeyEvent(KeyEvent e) {
             Key key = keyMap.get(e.getKeyCode());
+
             if (key != null) {
                 if (e.getID() == KeyEvent.KEY_PRESSED) {
+                    keyPressed.put(key, true);
                     keyDown.put(key, true);
                     if (key == Key.ESCAPE) {
                         if (mouseTaken) robotPaused = !robotPaused;
@@ -122,7 +148,8 @@ public class InputManager {
                         else hideMouse();
                     }
                 } else if (e.getID() == KeyEvent.KEY_RELEASED) {
-                    keyDown.put(key, false);
+                    keyPressed.put(key, false);
+                    keyUp.put(key, true);
                 }
                 return true;
             }
