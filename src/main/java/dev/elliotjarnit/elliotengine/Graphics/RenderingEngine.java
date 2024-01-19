@@ -21,6 +21,7 @@ public class RenderingEngine extends JPanel {
     private double lastFrameTime = System.nanoTime();
     // Map of pixel location to fowardmost object
     private HashMap<String, EObject> pixelMap = new HashMap<>();
+    private boolean currentlyRendering = false;
     private int fps = 0;
     public enum ProjectionMode {
         PERSPECTIVE,
@@ -59,6 +60,7 @@ public class RenderingEngine extends JPanel {
     // Start of rendering frame
     @Override
     public void paintComponent(Graphics g) {
+        this.currentlyRendering = true;
         Graphics2D g2d = (Graphics2D) g;
 
         // Calculate FPS
@@ -75,6 +77,7 @@ public class RenderingEngine extends JPanel {
         if (scene == null) {
             g2d.setColor(EColor.WHITE.toAwtColor());
             drawCenteredString(g2d, "No scene", new Rectangle(0, 0, this.getWidth(), this.getHeight()));
+            this.currentlyRendering = false;
             return;
         }
 
@@ -82,6 +85,7 @@ public class RenderingEngine extends JPanel {
         if (scene.getCamera() == null) {
             g2d.setColor(EColor.WHITE.toAwtColor());
             drawCenteredString(g2d, "No camera in scene", new Rectangle(0, 0, this.getWidth(), this.getHeight()));
+            this.currentlyRendering = false;
             return;
         }
 
@@ -94,6 +98,7 @@ public class RenderingEngine extends JPanel {
                 component.render(g2d);
             }
         }
+        this.currentlyRendering = false;
     }
 
     public void renderScene(EScene scene, Graphics2D g2d) {
@@ -237,6 +242,13 @@ public class RenderingEngine extends JPanel {
     }
 
     public EObject getObjectAtPoint(Vector2 point) {
+        while (this.currentlyRendering) {
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
         return this.pixelMap.get((int) point.x + "," + (int) point.y);
     }
 
