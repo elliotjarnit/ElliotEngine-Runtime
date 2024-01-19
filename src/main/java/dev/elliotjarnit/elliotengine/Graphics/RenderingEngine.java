@@ -20,7 +20,7 @@ public class RenderingEngine extends JPanel {
     private final ElliotEngine engine;
     private double lastFrameTime = System.nanoTime();
     // Map of pixel location to fowardmost object
-    private Map<Vector2, EObject> pixelMap = new HashMap<>();
+    private HashMap<String, EObject> pixelMap = new HashMap<>();
     private int fps = 0;
     public enum ProjectionMode {
         PERSPECTIVE,
@@ -191,7 +191,7 @@ public class RenderingEngine extends JPanel {
                     if (zBuffer[zIndex] < depth) {
                         zBuffer[zIndex] = depth;
                         img.setRGB(x, y, color.toAwtColor().getRGB());
-                        this.pixelMap.put(new Vector2(x, y), object);
+                        this.pixelMap.put(x + "," + y, object);
                     }
                 }
             }
@@ -237,7 +237,7 @@ public class RenderingEngine extends JPanel {
     }
 
     public EObject getObjectAtPoint(Vector2 point) {
-        return this.pixelMap.get(point);
+        return this.pixelMap.get((int) point.x + "," + (int) point.y);
     }
 
     public EObject getObjectLookingAt() {
