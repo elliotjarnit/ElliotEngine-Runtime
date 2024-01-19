@@ -1,9 +1,11 @@
 package BasicCubeDraw;
 
+import dev.elliotjarnit.elliotengine.Assets.FPSCounter;
 import dev.elliotjarnit.elliotengine.ElliotEngine;
 import dev.elliotjarnit.elliotengine.Graphics.EColor;
 import dev.elliotjarnit.elliotengine.Graphics.RenderingEngine;
 import dev.elliotjarnit.elliotengine.Objects.*;
+import dev.elliotjarnit.elliotengine.Overlay.EOverlay;
 import dev.elliotjarnit.elliotengine.Utils.Matrix4;
 import dev.elliotjarnit.elliotengine.Utils.Vector2;
 import dev.elliotjarnit.elliotengine.Utils.Vector3;
@@ -34,29 +36,30 @@ public class Engine extends ElliotEngine {
         this.inputManager.takeoverMouse();
         this.renderer.setProjectionMode(RenderingEngine.ProjectionMode.PERSPECTIVE);
 
-        EScene mainScene = new EScene(false);
+        EOverlay mainOverlay = new EOverlay();
+        mainOverlay.addComponent(new FPSCounter(new Vector2(25, 14)));
+
         playerCamera = new ECamera(new Vector3(0.1, 2, -10), 60.0);
-        playerCamera.setRenderDistance(1000.0);
-        SpinningPyramid myObject = new SpinningPyramid(new Vector3(0, 0, 50), 5, 5, EColor.RED);
-        KnightPiece knight1 = new KnightPiece(new Vector3(0, 0, 20));
-        ECube myCube = new ECube(new Vector3(20, 0, 0), 5, 5, 5, EColor.CYAN);
+        playerCamera.setFov(120);
+
+        EScene mainScene = new EScene();
+        SpinningPyramid myObject = new SpinningPyramid(new Vector3(0, 10, 50), 5, 5, EColor.RED);
+        KnightPiece knight1 = new KnightPiece(new Vector3(0, 10, 20));
+        ECube myCube = new ECube(new Vector3(20, 10, 0), 5, 5, 5, EColor.CYAN);
         System.out.println("Cube");
         for (EFace face : myCube.getFaces()) {
             System.out.println(face);
         }
+
+
         mainScene.addObject(myObject);
         mainScene.addObject(myCube);
         mainScene.addObject(knight1);
         mainScene.addObject(playerCamera);
         mainScene.setCamera(playerCamera);
-        this.setScene(mainScene);
 
-        Matrix4 test = new Matrix4(new double[] {
-                1313, 131, 333, 2,
-                222, 123, 3, 33,
-                22, 52, 5, 555,
-                33, 33, 555, 5
-        });
+        this.setScene(mainScene);
+        this.setOverlay(mainOverlay);
     }
 
     @Override
@@ -98,10 +101,6 @@ public class Engine extends ElliotEngine {
             } else if (this.renderer.getRenderMode() == RenderingEngine.RenderMode.SOLID) {
                 this.renderer.setRenderMode(RenderingEngine.RenderMode.WIREFRAME);
             }
-        }
-
-        if (this.inputManager.isKeyDown(InputManager.Key.ESCAPE)) {
-            this.stop();
         }
 
 

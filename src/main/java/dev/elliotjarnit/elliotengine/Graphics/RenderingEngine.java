@@ -19,6 +19,8 @@ public class RenderingEngine extends JPanel {
     private EOverlay overlay;
     private final ElliotEngine engine;
     private double lastFrameTime = System.nanoTime();
+    // Map of pixel location to fowardmost object
+    private Map<Vector2, EObject> pixelMap = new HashMap<>();
     private int fps = 0;
     public enum ProjectionMode {
         PERSPECTIVE,
@@ -127,11 +129,11 @@ public class RenderingEngine extends JPanel {
                 if (facePoints[0] == null || facePoints[1] == null || facePoints[2] == null) continue;
 
                 if (renderMode == RenderMode.SOLID) {
-                    this.renderFaceInWorld(img, zBuffer, facePoints[0], facePoints[1], facePoints[2], face.getColor());
+                    this.renderFaceInWorld(img, object, zBuffer, facePoints[0], facePoints[1], facePoints[2], face.getColor());
                 } else if (renderMode == RenderMode.WIREFRAME) {
                     this.renderFaceInWorldWireframe(g2d, facePoints[0], facePoints[1], facePoints[2]);
                 } else if (renderMode == RenderMode.BOTH) {
-                    this.renderFaceInWorld(img, zBuffer, facePoints[0], facePoints[1], facePoints[2], face.getColor());
+                    this.renderFaceInWorld(img, object, zBuffer, facePoints[0], facePoints[1], facePoints[2], face.getColor());
                     this.renderFaceInWorldWireframe(g2d, facePoints[0], facePoints[1], facePoints[2]);
                 }
             }
@@ -166,7 +168,7 @@ public class RenderingEngine extends JPanel {
         return screenSpace;
     }
 
-    public void renderFaceInWorld(BufferedImage img, double[] zBuffer, Vector3 point1, Vector3 point2, Vector3 point3, EColor color) {
+    public void renderFaceInWorld(BufferedImage img, EObject object, double[] zBuffer, Vector3 point1, Vector3 point2, Vector3 point3, EColor color) {
         int minX = (int) Math.max(0, Math.ceil(Math.min(point1.x, Math.min(point2.x, point3.x))));
         int maxX = (int) Math.min(img.getWidth() - 1, Math.floor(Math.max(point1.x, Math.max(point2.x, point3.x))));
         int minY = (int) Math.max(0, Math.ceil(Math.min(point1.y, Math.min(point2.y, point3.y))));
@@ -189,6 +191,7 @@ public class RenderingEngine extends JPanel {
                     if (zBuffer[zIndex] < depth) {
                         zBuffer[zIndex] = depth;
                         img.setRGB(x, y, color.toAwtColor().getRGB());
+                        this.pixelMap.put(new Vector2(x, y), object);
                     }
                 }
             }
@@ -234,7 +237,7 @@ public class RenderingEngine extends JPanel {
     }
 
     public EObject getObjectAtPoint(Vector2 point) {
-        return null;
+        return this.pixelMap.get(point);
     }
 
     public EObject getObjectLookingAt() {

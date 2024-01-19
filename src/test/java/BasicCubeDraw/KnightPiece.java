@@ -21,7 +21,7 @@ public class KnightPiece extends EObject {
 
     public KnightPiece(Vector3 origin) {
         super(origin);
-        this.EColor = EColor.WHITE;
+        this.EColor = EColor.BLUE;
         this.loadFaces();
     }
 
