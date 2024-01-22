@@ -21,7 +21,7 @@ public class RenderingEngine extends JPanel {
     private double lastFrameTime = System.nanoTime();
     // Map of pixel location to fowardmost object
     private HashMap<String, EObject> pixelMap = new HashMap<>();
-    private boolean currentlyRendering = false;
+    private volatile boolean currentlyRendering = false;
     private int fps = 0;
     public enum ProjectionMode {
         PERSPECTIVE,
@@ -249,6 +249,7 @@ public class RenderingEngine extends JPanel {
                 e.printStackTrace();
             }
         }
+
         return this.pixelMap.get((int) point.x + "," + (int) point.y);
     }
 

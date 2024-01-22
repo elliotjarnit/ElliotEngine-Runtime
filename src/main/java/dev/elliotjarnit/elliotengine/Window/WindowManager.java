@@ -2,15 +2,18 @@ package dev.elliotjarnit.elliotengine.Window;
 
 import dev.elliotjarnit.elliotengine.ElliotEngine;
 import dev.elliotjarnit.elliotengine.Graphics.RenderingEngine;
+import dev.elliotjarnit.elliotengine.Overlay.EOButton;
 import dev.elliotjarnit.elliotengine.Utils.Vector2;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 
 public class WindowManager {
     private JFrame window;
     private ElliotEngine engine;
     private RenderingEngine renderingEngine;
+    private ArrayList<EventListener> listeners;
 
     public WindowManager(ElliotEngine engine) {
         this.engine = engine;
@@ -20,6 +23,16 @@ public class WindowManager {
     public void setup() {
         // Setup window
         window = new JFrame(this.engine.getOption(ElliotEngine.Options.NAME));
+
+        // Setup window listeners
+        window.addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentResized(java.awt.event.ComponentEvent evt) {
+                for (EventListener listener : listeners) {
+                    listener.onWindowResize();
+                }
+            }
+        });
+
         String width = this.engine.getOption(ElliotEngine.Options.WINDOW_WIDTH);
         String height = this.engine.getOption(ElliotEngine.Options.WINDOW_HEIGHT);
         window.setSize(Integer.parseInt(width), Integer.parseInt(height));
@@ -28,6 +41,7 @@ public class WindowManager {
         Container pane = window.getContentPane();
         pane.setLayout(new BorderLayout());
         pane.add(renderingEngine, BorderLayout.CENTER);
+        this.listeners = new ArrayList<>();
     }
 
     public void start() {
@@ -39,6 +53,10 @@ public class WindowManager {
         window.dispose();
         window = null;
         renderingEngine = null;
+    }
+
+    public void addEventListener(EventListener listener) {
+        this.listeners.add(listener);
     }
 
     public Vector2 getWindowSize() {
@@ -62,5 +80,11 @@ public class WindowManager {
 
     public JFrame getWindow() {
         return window;
+    }
+
+    public static class EventListener {
+        public void onWindowResize() {
+
+        }
     }
 }
