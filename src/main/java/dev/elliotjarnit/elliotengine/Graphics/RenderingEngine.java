@@ -19,21 +19,28 @@ public class RenderingEngine extends JPanel {
     private EOverlay overlay;
     private final ElliotEngine engine;
     private double lastFrameTime = System.nanoTime();
-    // Map of pixel location to fowardmost object
     private HashMap<String, EObject> pixelMap = new HashMap<>();
     private volatile boolean currentlyRendering = false;
     private int fps = 0;
-    public enum ProjectionMode {
-        PERSPECTIVE,
-        ORTHOGRAPHIC
-    }
+
+
+    // Options
     private ProjectionMode projectionMode = ProjectionMode.PERSPECTIVE;
+    private RenderMode renderMode = RenderMode.SOLID;
+    private int fpsCap = -1;
+
+
+    // Enums
     public enum RenderMode {
         WIREFRAME,
         SOLID,
         BOTH
     }
-    private RenderMode renderMode = RenderMode.SOLID;
+    public enum ProjectionMode {
+        PERSPECTIVE,
+        ORTHOGRAPHIC
+    }
+
 
     public RenderingEngine(ElliotEngine engine) {
         super();
@@ -43,7 +50,6 @@ public class RenderingEngine extends JPanel {
     public void setProjectionMode(ProjectionMode mode) {
         this.projectionMode = mode;
     }
-
     public ProjectionMode getProjectionMode() {
         return this.projectionMode;
     }
@@ -51,9 +57,15 @@ public class RenderingEngine extends JPanel {
     public void setRenderMode(RenderMode mode) {
         this.renderMode = mode;
     }
-
     public RenderMode getRenderMode() {
         return this.renderMode;
+    }
+
+    public void setFpsCap(int fpsCap) {
+        this.fpsCap = fpsCap;
+    }
+    public int getFpsCap() {
+        return this.fpsCap;
     }
 
     // JPanel built-in paint function
@@ -62,10 +74,24 @@ public class RenderingEngine extends JPanel {
     public void paintComponent(Graphics g) {
         this.currentlyRendering = true;
         Graphics2D g2d = (Graphics2D) g;
+        double currentTime = System.nanoTime();
+
+        // FPS cap
+        if (fpsCap != -1) {
+            double targetTime = 1.0 / fpsCap;
+            double timeTaken = (currentTime - lastFrameTime) / 1000000000;
+            if (timeTaken < targetTime) {
+                try {
+                    Thread.sleep((long) ((targetTime - timeTaken) * 1000));
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
 
         // Calculate FPS
-        double currentTime = System.nanoTime();
-        fps = (int) (1 / ((currentTime - lastFrameTime) / 1000000000));
+        currentTime = System.nanoTime();
+        fps = (int) Math.round(1 / ((currentTime - lastFrameTime) / 1000000000));
         lastFrameTime = currentTime;
 
         // Clear screen

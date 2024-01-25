@@ -35,6 +35,7 @@ public class Engine extends ElliotEngine {
     public void setup() {
         this.inputManager.takeoverMouse();
         this.renderer.setProjectionMode(RenderingEngine.ProjectionMode.PERSPECTIVE);
+        this.renderer.setFpsCap(30);
 
         EOverlay mainOverlay = new EOverlay();
         mainOverlay.addComponent(new FPSCounter(new Vector2(25, 14)));
