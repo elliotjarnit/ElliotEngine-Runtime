@@ -5,88 +5,83 @@ import dev.elliotjarnit.elliotengine.Graphics.RenderingEngine;
 import dev.elliotjarnit.elliotengine.Overlay.EOButton;
 import dev.elliotjarnit.elliotengine.Utils.Vector2;
 
-import javax.swing.*;
-import java.awt.*;
+import org.lwjgl.glfw.*;
+import static org.lwjgl.glfw.Callbacks.*;
+import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.system.MemoryStack.*;
+import static org.lwjgl.system.MemoryUtil.*;
+
 import java.util.ArrayList;
 
-import org.lwjgl.glfw.*;
-
 public class WindowManager {
-    private JFrame window;
+    private long window;
     private ElliotEngine engine;
-    private RenderingEngine renderingEngine;
-    private ArrayList<EventListener> listeners;
 
     public WindowManager(ElliotEngine engine) {
         this.engine = engine;
-        this.renderingEngine = engine.renderer;
     }
 
     public void setup() {
-        // Setup window
-        window = new JFrame(this.engine.getOption(ElliotEngine.Options.NAME));
+        initGLFW();
+        // Configure window
+        glfwDefaultWindowHints();
+        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
-        // Setup window listeners
-        window.addComponentListener(new java.awt.event.ComponentAdapter() {
-            public void componentResized(java.awt.event.ComponentEvent evt) {
-                for (EventListener listener : listeners) {
-                    listener.onWindowResize();
-                }
-            }
-        });
+        // Get options
+        int width = Integer.parseInt(this.engine.getOption(ElliotEngine.Options.WINDOW_WIDTH));
+        int height = Integer.parseInt(this.engine.getOption(ElliotEngine.Options.WINDOW_HEIGHT));
 
-        String width = this.engine.getOption(ElliotEngine.Options.WINDOW_WIDTH);
-        String height = this.engine.getOption(ElliotEngine.Options.WINDOW_HEIGHT);
-        window.setSize(Integer.parseInt(width), Integer.parseInt(height));
-        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        // Setup renderer
-        Container pane = window.getContentPane();
-        pane.setLayout(new BorderLayout());
-        pane.add(renderingEngine, BorderLayout.CENTER);
-        this.listeners = new ArrayList<>();
+        // Make window
+        window = glfwCreateWindow(width, height, this.engine.getOption(ElliotEngine.Options.NAME), NULL, NULL);
+        if ( window == NULL )
+            throw new RuntimeException("Failed to create window");
+    }
+
+    public void initGLFW() {
+        GLFWErrorCallback.createPrint(System.err).set();
+        if ( !glfwInit() )
+            throw new IllegalStateException("Unable to initialize GLFW");
     }
 
     public void start() {
-        window.setVisible(true);
+        glfwShowWindow(window);
     }
 
     public void stop() {
-        window.setVisible(false);
-        window.dispose();
-        window = null;
-        renderingEngine = null;
-    }
+        glfwFreeCallbacks(window);
+        glfwDestroyWindow(window);
 
-    public void addEventListener(EventListener listener) {
-        this.listeners.add(listener);
+        glfwTerminate();
+        glfwSetErrorCallback(null).free();
+
+        window = 0;
     }
 
     public Vector2 getWindowSize() {
-        Insets insets = window.getInsets();
-        return new Vector2(window.getWidth() - (insets.left + insets.right), window.getHeight() - (insets.top + insets.bottom));
+//        Insets insets = window.getInsets();
+//        return new Vector2(window.getWidth() - (insets.left + insets.right), window.getHeight() - (insets.top + insets.bottom));
+        return new Vector2(0, 0);
     }
 
     public Vector2 getWindowCenter() {
-        Insets insets = window.getInsets();
-        return new Vector2((window.getWidth() - (insets.left + insets.right)) / 2, (window.getHeight() - (insets.top + insets.bottom)) / 2);
+//        Insets insets = window.getInsets();
+//        return new Vector2((window.getWidth() - (insets.left + insets.right)) / 2, (window.getHeight() - (insets.top + insets.bottom)) / 2);
+        return new Vector2(0, 0);
     }
 
     public Vector2 getWindowPosition() {
-        return new Vector2(window.getLocationOnScreen().x, window.getLocationOnScreen().y);
+//        return new Vector2(window.getLocationOnScreen().x, window.getLocationOnScreen().y);
+        return new Vector2(0, 0);
     }
 
     public Vector2 getWindowCenterPosition() {
-        Point location = window.getLocationOnScreen();
-        return new Vector2(location.x + ((double) window.getWidth() / 2), location.y + ((double) window.getHeight() / 2));
+//        Point location = window.getLocationOnScreen();
+//        return new Vector2(location.x + ((double) window.getWidth() / 2), location.y + ((double) window.getHeight() / 2));
+        return new Vector2(0, 0);
     }
 
-    public JFrame getWindow() {
+    public long getWindow() {
         return window;
-    }
-
-    public static class EventListener {
-        public void onWindowResize() {
-
-        }
     }
 }
