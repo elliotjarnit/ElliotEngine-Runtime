@@ -9,6 +9,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 
+import org.lwjgl.glfw.*;
+
 public class WindowManager {
     private JFrame window;
     private ElliotEngine engine;

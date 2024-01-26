@@ -7,12 +7,16 @@ group = 'dev.elliotjarnit'
 
 repositories {
     mavenCentral()
+    maven {
+        url "https://oss.sonatype.org/content/repositories/snapshots/"
+    }
 }
 
 dependencies {
     api 'org.apache.commons:commons-math3:3.6.1'
     implementation 'com.google.guava:guava:32.1.1-jre'
-    implementation 'org.jocl:jocl:2.0.5'
+    implementation "org.lwjgl:lwjgl:3.2.3"
+    implementation "org.lwjgl:lwjgl-glfw:3.2.3"
 }
 
 java {
