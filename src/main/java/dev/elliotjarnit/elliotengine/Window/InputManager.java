@@ -1,56 +1,48 @@
 package dev.elliotjarnit.elliotengine.Window;
 import dev.elliotjarnit.elliotengine.ElliotEngine;
 import dev.elliotjarnit.elliotengine.Utils.Vector2;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.glfw.GLFWKeyCallback;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
+import java.nio.DoubleBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.lwjgl.glfw.GLFW.*;
+
 public class InputManager {
     private ElliotEngine engine;
-    private KeyboardDispatcher keyDispatcher;
-    private MouseDispatcher mouseDispatcher;
-    private Robot robot;
-    private boolean robotPaused = false;
     private boolean mouseTaken = false;
     private final Map<Key, Boolean> keyDown = new HashMap<>();
     private final Map<Key, Boolean> keyUp = new HashMap<>();
     private final Map<Key, Boolean> keyPressed = new HashMap<>();
-    private final Map<MouseButton, Boolean> mouseDown = new HashMap<>();
 
     public InputManager(ElliotEngine engine) {
         this.engine = engine;
     }
 
     public void setup() {
-        for (MouseButton button : MouseButton.values()) {
-            mouseDown.put(button, false);
-        }
         for (Key key : Key.values()) {
             keyDown.put(key, false);
-        }
-        for (Key key : Key.values()) {
             keyUp.put(key, false);
-        }
-        for (Key key : Key.values()) {
             keyPressed.put(key, false);
         }
 
-        try {
-            robot = new Robot();
-        } catch (AWTException e) {
-            e.printStackTrace();
-        }
-
-        keyDispatcher = new KeyboardDispatcher();
-        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(keyDispatcher);
-
-        mouseDispatcher = new MouseDispatcher();
-        this.engine.windowManager.getWindow().addMouseListener(mouseDispatcher);
+        GLFWKeyCallback keyCallback;
+        glfwSetKeyCallback(engine.windowManager.getWindow(), keyCallback = GLFWKeyCallback.create((window, key, scancode, action, mods) -> {
+            if (action == GLFW_PRESS) {
+                keyDown.put(keyMap.get(key), true);
+                keyPressed.put(keyMap.get(key), true);
+            } else if (action == GLFW_RELEASE) {
+                keyUp.put(keyMap.get(key), true);
+                keyPressed.put(keyMap.get(key), false);
+            }
+        }));
     }
 
     public boolean isKeyPressed(Key key) {
@@ -62,7 +54,9 @@ public class InputManager {
     public boolean isKeyDown(Key key) {
         synchronized (this) {
             boolean down = keyDown.get(key);
-            keyDown.put(key, false);
+            for (Key k : Key.values()) {
+                keyDown.put(k, false);
+            }
             return down;
         }
     }
@@ -70,145 +64,44 @@ public class InputManager {
     public boolean isKeyUp(Key key) {
         synchronized (this) {
             boolean up = keyUp.get(key);
-            keyUp.put(key, false);
+            for (Key k : Key.values()) {
+                keyUp.put(k, false);
+            }
             return up;
         }
     }
 
     public boolean isMouseDown(MouseButton button) {
-        synchronized (this) {
-            boolean down = mouseDown.get(button);
-            for (MouseButton btn : MouseButton.values()) {
-                mouseDown.put(btn, false);
-            }
-            return down;
-        }
+        int buttonCode;
+        if (button == MouseButton.LEFT) buttonCode = MouseEvent.BUTTON1;
+        else if (button == MouseButton.RIGHT) buttonCode = MouseEvent.BUTTON3;
+        else if (button == MouseButton.MIDDLE) buttonCode = MouseEvent.BUTTON2;
+        else return false;
+
+        return glfwGetMouseButton(engine.windowManager.getWindow(), buttonCode) == 1 ? true : false;
     }
 
     public Vector2 getMousePos() {
-        // Returns mouse position in window coordinates
-        Point mousePos = MouseInfo.getPointerInfo().getLocation();
-        Point windowPos = this.engine.renderer.getLocationOnScreen();
-        return new Vector2(mousePos.x - windowPos.x, mousePos.y - windowPos.y);
+        DoubleBuffer b1 = BufferUtils.createDoubleBuffer(1);
+        DoubleBuffer b2 = BufferUtils.createDoubleBuffer(1);
+        glfwGetCursorPos(engine.windowManager.getWindow(), b1, b2);
+
+        return new Vector2((float) b1.get(0), (float) b2.get(0));
     }
 
     public Vector2 getMouseDelta() {
         if (!mouseTaken) return new Vector2(0, 0);
-        if (!engine.windowManager.getWindow().hasFocus()) return new Vector2(0, 0);
-        if (robotPaused) return new Vector2(0, 0);
+        DoubleBuffer b1 = BufferUtils.createDoubleBuffer(1);
+        DoubleBuffer b2 = BufferUtils.createDoubleBuffer(1);
+        glfwGetCursorPos(engine.windowManager.getWindow(), b1, b2);
 
-        Point mousePos = MouseInfo.getPointerInfo().getLocation();
-        Vector2 center = this.engine.windowManager.getWindowCenterPosition();
-        Vector2 mouseDelta = new Vector2(center.x - mousePos.x, center.y - mousePos.y);
-        this.moveMouseToMiddle();
-
-        if (mouseDelta.x > 150 || mouseDelta.x < -150) mouseDelta.x = 0;
-        if (mouseDelta.y > 150 || mouseDelta.y < -150) mouseDelta.y = 0;
-
-        return mouseDelta;
+        return new Vector2((float) b1.get(0), (float) b2.get(0));
     }
 
     public void takeoverMouse() {
-        this.hideMouse();
-        this.engine.windowManager.getWindow().setFocusTraversalKeysEnabled(false);
-        this.moveMouseToMiddle();
+        glfwSetInputMode(engine.windowManager.getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
         mouseTaken = true;
-    }
-
-    private void hideMouse() {
-        this.engine.windowManager.getWindow().setCursor(this.engine.windowManager.getWindow().getToolkit().createCustomCursor(
-                new BufferedImage(3, 3, BufferedImage.TYPE_INT_ARGB), new Point(0, 0), "null"));
-    }
-
-    private void showMouse() {
-        this.engine.windowManager.getWindow().setCursor(Cursor.getDefaultCursor());
-    }
-
-    private void moveMouseToMiddle() {
-        if (!mouseTaken) return;
-        if (!engine.windowManager.getWindow().hasFocus()) return;
-        if (robotPaused) return;
-        Vector2 mousePos = this.engine.windowManager.getWindowCenterPosition();
-        this.robot.mouseMove((int) mousePos.x, (int) mousePos.y);
-    }
-
-    private class KeyboardDispatcher implements KeyEventDispatcher {
-        @Override
-        public boolean dispatchKeyEvent(KeyEvent e) {
-            Key key = keyMap.get(e.getKeyCode());
-
-            if (key != null) {
-                if (e.getID() == KeyEvent.KEY_PRESSED) {
-                    keyPressed.put(key, true);
-                    keyDown.put(key, true);
-                    if (key == Key.ESCAPE) {
-                        if (mouseTaken) robotPaused = !robotPaused;
-                        if (robotPaused) showMouse();
-                        else hideMouse();
-                    }
-                } else if (e.getID() == KeyEvent.KEY_RELEASED) {
-                    keyPressed.put(key, false);
-                    keyUp.put(key, true);
-                }
-                return true;
-            }
-            return false;
-        }
-    }
-
-    private class MouseDispatcher implements MouseListener {
-        @Override
-        public void mouseClicked(MouseEvent e) {
-        }
-        @Override
-        public void mousePressed(MouseEvent e) {
-            for (MouseButton button : MouseButton.values()) {
-                mouseDown.put(button, false);
-            }
-
-            if (e.getButton() == MouseEvent.BUTTON1) {
-                mouseDown.put(MouseButton.LEFT, true);
-            } else if (e.getButton() == MouseEvent.BUTTON2) {
-                mouseDown.put(MouseButton.MIDDLE, true);
-            } else if (e.getButton() == MouseEvent.BUTTON3) {
-                mouseDown.put(MouseButton.RIGHT, true);
-            }
-        }
-        @Override
-        public void mouseReleased(MouseEvent e) {
-            for (MouseButton button : MouseButton.values()) {
-                mouseDown.put(button, false);
-            }
-        }
-        @Override
-        public void mouseEntered(MouseEvent e) {
-            for (MouseButton button : MouseButton.values()) {
-                mouseDown.put(button, false);
-            }
-
-            if (e.getButton() == MouseEvent.BUTTON1) {
-                mouseDown.put(MouseButton.LEFT, true);
-            } else if (e.getButton() == MouseEvent.BUTTON2) {
-                mouseDown.put(MouseButton.MIDDLE, true);
-            } else if (e.getButton() == MouseEvent.BUTTON3) {
-                mouseDown.put(MouseButton.RIGHT, true);
-            }
-        }
-        @Override
-        public void mouseExited(MouseEvent e) {
-            for (MouseButton button : MouseButton.values()) {
-                mouseDown.put(button, false);
-            }
-
-            if (e.getButton() == MouseEvent.BUTTON1) {
-                mouseDown.put(MouseButton.LEFT, true);
-            } else if (e.getButton() == MouseEvent.BUTTON2) {
-                mouseDown.put(MouseButton.MIDDLE, true);
-            } else if (e.getButton() == MouseEvent.BUTTON3) {
-                mouseDown.put(MouseButton.RIGHT, true);
-            }
-        }
     }
 
     public enum MouseButton {
@@ -222,114 +115,121 @@ public class InputManager {
         NUM_5, NUM_6, NUM_7, NUM_8, NUM_9,
         ESCAPE, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12,
         GRAVE, MINUS, EQUALS, BACKSPACE, TAB, OPEN_BRACKET, CLOSE_BRACKET,
-        BACKSLASH, CAPS_LOCK, SEMICOLON, QUOTE, ENTER, SHIFT, COMMA, PERIOD,
+        BACKSLASH, CAPS_LOCK, SEMICOLON, QUOTE, ENTER, COMMA, PERIOD,
         SLASH, SPACE, INSERT, DELETE, HOME, END, PAGE_UP, PAGE_DOWN,
         PRINT_SCREEN, SCROLL_LOCK, PAUSE, UP, DOWN, LEFT, RIGHT,
         NUM_LOCK, NUMPAD_0, NUMPAD_1, NUMPAD_2, NUMPAD_3, NUMPAD_4, NUMPAD_5,
         NUMPAD_6, NUMPAD_7, NUMPAD_8, NUMPAD_9, NUMPAD_ADD, NUMPAD_SUBTRACT,
         NUMPAD_MULTIPLY, NUMPAD_DIVIDE, NUMPAD_DECIMAL, NUMPAD_ENTER,
-        CONTROL, ALT, WINDOWS, MENU;
+        CONTROL_L, CONTROL_R, ALT_L, ALT_R, SHIFT_L, SHIFT_R, SUPER_L, SUPER_R,
+        MENU;
     }
 
+    // Map GLFW key codes to Key enum
     private final Map<Integer, Key> keyMap = new HashMap<Integer, Key>() {{
-        put(KeyEvent.VK_A, Key.A);
-        put(KeyEvent.VK_B, Key.B);
-        put(KeyEvent.VK_C, Key.C);
-        put(KeyEvent.VK_D, Key.D);
-        put(KeyEvent.VK_E, Key.E);
-        put(KeyEvent.VK_F, Key.F);
-        put(KeyEvent.VK_G, Key.G);
-        put(KeyEvent.VK_H, Key.H);
-        put(KeyEvent.VK_I, Key.I);
-        put(KeyEvent.VK_J, Key.J);
-        put(KeyEvent.VK_K, Key.K);
-        put(KeyEvent.VK_L, Key.L);
-        put(KeyEvent.VK_M, Key.M);
-        put(KeyEvent.VK_N, Key.N);
-        put(KeyEvent.VK_O, Key.O);
-        put(KeyEvent.VK_P, Key.P);
-        put(KeyEvent.VK_Q, Key.Q);
-        put(KeyEvent.VK_R, Key.R);
-        put(KeyEvent.VK_S, Key.S);
-        put(KeyEvent.VK_T, Key.T);
-        put(KeyEvent.VK_U, Key.U);
-        put(KeyEvent.VK_V, Key.V);
-        put(KeyEvent.VK_W, Key.W);
-        put(KeyEvent.VK_X, Key.X);
-        put(KeyEvent.VK_Y, Key.Y);
-        put(KeyEvent.VK_Z, Key.Z);
-        put(KeyEvent.VK_0, Key.NUM_0);
-        put(KeyEvent.VK_1, Key.NUM_1);
-        put(KeyEvent.VK_2, Key.NUM_2);
-        put(KeyEvent.VK_3, Key.NUM_3);
-        put(KeyEvent.VK_4, Key.NUM_4);
-        put(KeyEvent.VK_5, Key.NUM_5);
-        put(KeyEvent.VK_6, Key.NUM_6);
-        put(KeyEvent.VK_7, Key.NUM_7);
-        put(KeyEvent.VK_8, Key.NUM_8);
-        put(KeyEvent.VK_9, Key.NUM_9);
-        put(KeyEvent.VK_ESCAPE, Key.ESCAPE);
-        put(KeyEvent.VK_F1, Key.F1);
-        put(KeyEvent.VK_F2, Key.F2);
-        put(KeyEvent.VK_F3, Key.F3);
-        put(KeyEvent.VK_F4, Key.F4);
-        put(KeyEvent.VK_F5, Key.F5);
-        put(KeyEvent.VK_F6, Key.F6);
-        put(KeyEvent.VK_F7, Key.F7);
-        put(KeyEvent.VK_F8, Key.F8);
-        put(KeyEvent.VK_F9, Key.F9);
-        put(KeyEvent.VK_F10, Key.F10);
-        put(KeyEvent.VK_F11, Key.F11);
-        put(KeyEvent.VK_F12, Key.F12);
-        put(KeyEvent.VK_BACK_QUOTE, Key.GRAVE);
-        put(KeyEvent.VK_MINUS, Key.MINUS);
-        put(KeyEvent.VK_EQUALS, Key.EQUALS);
-        put(KeyEvent.VK_BACK_SPACE, Key.BACKSPACE);
-        put(KeyEvent.VK_TAB, Key.TAB);
-        put(KeyEvent.VK_OPEN_BRACKET, Key.OPEN_BRACKET);
-        put(KeyEvent.VK_CLOSE_BRACKET, Key.CLOSE_BRACKET);
-        put(KeyEvent.VK_BACK_SLASH, Key.BACKSLASH);
-        put(KeyEvent.VK_CAPS_LOCK, Key.CAPS_LOCK);
-        put(KeyEvent.VK_SEMICOLON, Key.SEMICOLON);
-        put(KeyEvent.VK_QUOTE, Key.QUOTE);
-        put(KeyEvent.VK_ENTER, Key.ENTER);
-        put(KeyEvent.VK_SHIFT, Key.SHIFT);
-        put(KeyEvent.VK_COMMA, Key.COMMA);
-        put(KeyEvent.VK_PERIOD, Key.PERIOD);
-        put(KeyEvent.VK_SLASH, Key.SLASH);
-        put(KeyEvent.VK_SPACE, Key.SPACE);
-        put(KeyEvent.VK_INSERT, Key.INSERT);
-        put(KeyEvent.VK_DELETE, Key.DELETE);
-        put(KeyEvent.VK_HOME, Key.HOME);
-        put(KeyEvent.VK_END, Key.END);
-        put(KeyEvent.VK_PAGE_UP, Key.PAGE_UP);
-        put(KeyEvent.VK_PAGE_DOWN, Key.PAGE_DOWN);
-        put(KeyEvent.VK_PRINTSCREEN, Key.PRINT_SCREEN);
-        put(KeyEvent.VK_SCROLL_LOCK, Key.SCROLL_LOCK);
-        put(KeyEvent.VK_PAUSE, Key.PAUSE);
-        put(KeyEvent.VK_UP, Key.UP);
-        put(KeyEvent.VK_DOWN, Key.DOWN);
-        put(KeyEvent.VK_LEFT, Key.LEFT);
-        put(KeyEvent.VK_RIGHT, Key.RIGHT);
-        put(KeyEvent.VK_NUM_LOCK, Key.NUM_LOCK);
-        put(KeyEvent.VK_NUMPAD0, Key.NUMPAD_0);
-        put(KeyEvent.VK_NUMPAD1, Key.NUMPAD_1);
-        put(KeyEvent.VK_NUMPAD2, Key.NUMPAD_2);
-        put(KeyEvent.VK_NUMPAD3, Key.NUMPAD_3);
-        put(KeyEvent.VK_NUMPAD4, Key.NUMPAD_4);
-        put(KeyEvent.VK_NUMPAD5, Key.NUMPAD_5);
-        put(KeyEvent.VK_NUMPAD6, Key.NUMPAD_6);
-        put(KeyEvent.VK_NUMPAD7, Key.NUMPAD_7);
-        put(KeyEvent.VK_NUMPAD8, Key.NUMPAD_8);
-        put(KeyEvent.VK_NUMPAD9, Key.NUMPAD_9);
-        put(KeyEvent.VK_ADD, Key.NUMPAD_ADD);
-        put(KeyEvent.VK_SUBTRACT, Key.NUMPAD_SUBTRACT);
-        put(KeyEvent.VK_MULTIPLY, Key.NUMPAD_MULTIPLY);
-        put(KeyEvent.VK_DIVIDE, Key.NUMPAD_DIVIDE);
-        put(KeyEvent.VK_DECIMAL, Key.NUMPAD_DECIMAL);
-        put(KeyEvent.VK_CONTROL, Key.CONTROL);
-        put(KeyEvent.VK_ALT, Key.ALT);
-        put(KeyEvent.VK_WINDOWS, Key.WINDOWS);
-        put(KeyEvent.VK_CONTEXT_MENU, Key.MENU);
+        put(GLFW_KEY_A, Key.A);
+        put(GLFW_KEY_B, Key.B);
+        put(GLFW_KEY_C, Key.C);
+        put(GLFW_KEY_D, Key.D);
+        put(GLFW_KEY_E, Key.E);
+        put(GLFW_KEY_F, Key.F);
+        put(GLFW_KEY_G, Key.G);
+        put(GLFW_KEY_H, Key.H);
+        put(GLFW_KEY_I, Key.I);
+        put(GLFW_KEY_J, Key.J);
+        put(GLFW_KEY_K, Key.K);
+        put(GLFW_KEY_L, Key.L);
+        put(GLFW_KEY_M, Key.M);
+        put(GLFW_KEY_N, Key.N);
+        put(GLFW_KEY_O, Key.O);
+        put(GLFW_KEY_P, Key.P);
+        put(GLFW_KEY_Q, Key.Q);
+        put(GLFW_KEY_R, Key.R);
+        put(GLFW_KEY_S, Key.S);
+        put(GLFW_KEY_T, Key.T);
+        put(GLFW_KEY_U, Key.U);
+        put(GLFW_KEY_V, Key.V);
+        put(GLFW_KEY_W, Key.W);
+        put(GLFW_KEY_X, Key.X);
+        put(GLFW_KEY_Y, Key.Y);
+        put(GLFW_KEY_Z, Key.Z);
+        put(GLFW_KEY_0, Key.NUM_0);
+        put(GLFW_KEY_1, Key.NUM_1);
+        put(GLFW_KEY_2, Key.NUM_2);
+        put(GLFW_KEY_3, Key.NUM_3);
+        put(GLFW_KEY_4, Key.NUM_4);
+        put(GLFW_KEY_5, Key.NUM_5);
+        put(GLFW_KEY_6, Key.NUM_6);
+        put(GLFW_KEY_7, Key.NUM_7);
+        put(GLFW_KEY_8, Key.NUM_8);
+        put(GLFW_KEY_9, Key.NUM_9);
+        put(GLFW_KEY_ESCAPE, Key.ESCAPE);
+        put(GLFW_KEY_F1, Key.F1);
+        put(GLFW_KEY_F2, Key.F2);
+        put(GLFW_KEY_F3, Key.F3);
+        put(GLFW_KEY_F4, Key.F4);
+        put(GLFW_KEY_F5, Key.F5);
+        put(GLFW_KEY_F6, Key.F6);
+        put(GLFW_KEY_F7, Key.F7);
+        put(GLFW_KEY_F8, Key.F8);
+        put(GLFW_KEY_F9, Key.F9);
+        put(GLFW_KEY_F10, Key.F10);
+        put(GLFW_KEY_F11, Key.F11);
+        put(GLFW_KEY_F12, Key.F12);
+        put(GLFW_KEY_GRAVE_ACCENT, Key.GRAVE);
+        put(GLFW_KEY_MINUS, Key.MINUS);
+        put(GLFW_KEY_EQUAL, Key.EQUALS);
+        put(GLFW_KEY_BACKSPACE, Key.BACKSPACE);
+        put(GLFW_KEY_TAB, Key.TAB);
+        put(GLFW_KEY_LEFT_BRACKET, Key.OPEN_BRACKET);
+        put(GLFW_KEY_RIGHT_BRACKET, Key.CLOSE_BRACKET);
+        put(GLFW_KEY_BACKSLASH, Key.BACKSLASH);
+        put(GLFW_KEY_CAPS_LOCK, Key.CAPS_LOCK);
+        put(GLFW_KEY_SEMICOLON, Key.SEMICOLON);
+        put(GLFW_KEY_APOSTROPHE, Key.QUOTE);
+        put(GLFW_KEY_ENTER, Key.ENTER);
+        put(GLFW_KEY_COMMA, Key.COMMA);
+        put(GLFW_KEY_PERIOD, Key.PERIOD);
+        put(GLFW_KEY_SLASH, Key.SLASH);
+        put(GLFW_KEY_SPACE, Key.SPACE);
+        put(GLFW_KEY_INSERT, Key.INSERT);
+        put(GLFW_KEY_DELETE, Key.DELETE);
+        put(GLFW_KEY_HOME, Key.HOME);
+        put(GLFW_KEY_END, Key.END);
+        put(GLFW_KEY_PAGE_UP, Key.PAGE_UP);
+        put(GLFW_KEY_PAGE_DOWN, Key.PAGE_DOWN);
+        put(GLFW_KEY_PRINT_SCREEN, Key.PRINT_SCREEN);
+        put(GLFW_KEY_SCROLL_LOCK, Key.SCROLL_LOCK);
+        put(GLFW_KEY_PAUSE, Key.PAUSE);
+        put(GLFW_KEY_UP, Key.UP);
+        put(GLFW_KEY_DOWN, Key.DOWN);
+        put(GLFW_KEY_LEFT, Key.LEFT);
+        put(GLFW_KEY_RIGHT, Key.RIGHT);
+        put(GLFW_KEY_NUM_LOCK, Key.NUM_LOCK);
+        put(GLFW_KEY_KP_0, Key.NUMPAD_0);
+        put(GLFW_KEY_KP_1, Key.NUMPAD_1);
+        put(GLFW_KEY_KP_2, Key.NUMPAD_2);
+        put(GLFW_KEY_KP_3, Key.NUMPAD_3);
+        put(GLFW_KEY_KP_4, Key.NUMPAD_4);
+        put(GLFW_KEY_KP_5, Key.NUMPAD_5);
+        put(GLFW_KEY_KP_6, Key.NUMPAD_6);
+        put(GLFW_KEY_KP_7, Key.NUMPAD_7);
+        put(GLFW_KEY_KP_8, Key.NUMPAD_8);
+        put(GLFW_KEY_KP_9, Key.NUMPAD_9);
+        put(GLFW_KEY_KP_DECIMAL, Key.NUMPAD_DECIMAL);
+        put(GLFW_KEY_KP_DIVIDE, Key.NUMPAD_DIVIDE);
+        put(GLFW_KEY_KP_MULTIPLY, Key.NUMPAD_MULTIPLY);
+        put(GLFW_KEY_KP_SUBTRACT, Key.NUMPAD_SUBTRACT);
+        put(GLFW_KEY_KP_ADD, Key.NUMPAD_ADD);
+        put(GLFW_KEY_KP_ENTER, Key.NUMPAD_ENTER);
+        put(GLFW_KEY_LEFT_CONTROL, Key.CONTROL_L);
+        put(GLFW_KEY_LEFT_ALT, Key.ALT_L);
+        put(GLFW_KEY_LEFT_SHIFT, Key.SHIFT_L);
+        put(GLFW_KEY_LEFT_SUPER, Key.SUPER_L);
+        put(GLFW_KEY_RIGHT_CONTROL, Key.CONTROL_R);
+        put(GLFW_KEY_RIGHT_ALT, Key.ALT_R);
+        put(GLFW_KEY_RIGHT_SHIFT, Key.SHIFT_R);
+        put(GLFW_KEY_RIGHT_SUPER, Key.SUPER_R);
+        put(GLFW_KEY_MENU, Key.MENU);
     }};
 }

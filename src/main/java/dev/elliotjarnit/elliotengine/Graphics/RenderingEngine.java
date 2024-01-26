@@ -14,7 +14,7 @@ import java.awt.image.BufferedImage;
 import java.util.*;
 import java.util.List;
 
-public class RenderingEngine extends JPanel {
+public class RenderingEngine {
     private EScene scene;
     private EOverlay overlay;
     private final ElliotEngine engine;
@@ -68,12 +68,8 @@ public class RenderingEngine extends JPanel {
         return this.fpsCap;
     }
 
-    // JPanel built-in paint function
-    // Start of rendering frame
-    @Override
-    public void paintComponent(Graphics g) {
+    public void renderFrame() {
         this.currentlyRendering = true;
-        Graphics2D g2d = (Graphics2D) g;
         double currentTime = System.nanoTime();
 
         // FPS cap
@@ -241,12 +237,10 @@ public class RenderingEngine extends JPanel {
 
     public void setScene(EScene scene) {
         this.scene = scene;
-        this.repaint();
     }
 
     public void setOverlay(EOverlay overlay) {
         this.overlay = overlay;
-        this.repaint();
     }
 
     public void drawCenteredString(Graphics g, String text, Rectangle rect) {
